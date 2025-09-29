@@ -27,8 +27,15 @@ class BaseController extends Controller
 	 *
 	 * @var array
 	 */
-	protected $helpers = [];
-
+	protected $helpers = ['url'];
+	public function is_session_available()
+	{
+		if (session()->get('passed') != true):
+			session()->setFlashdata('warning', 'Silahkan Login!');
+			header('Location: ' . base_url(route_to('/' . bin2hex('login'))));
+			exit();
+		endif;
+	}
 	/**
 	 * Constructor.
 	 *
@@ -36,6 +43,8 @@ class BaseController extends Controller
 	 * @param ResponseInterface $response
 	 * @param LoggerInterface   $logger
 	 */
+
+	protected $session;
 	public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
 	{
 		// Do Not Edit This Line
@@ -45,5 +54,7 @@ class BaseController extends Controller
 		// Preload any models, libraries, etc, here.
 		//--------------------------------------------------------------------
 		// E.g.: $this->session = \Config\Services::session();
+
+		$this->session = \Config\Services::session();
 	}
 }
