@@ -2,7 +2,7 @@
 <?= $this->section('content') ?>
 <div class="row">
     <div class="col-12">
-        <div class="card">
+        <div class="card card-primary">
             <div class="card-header">
                 <h4>Data Peserta Didik</h4>
                 <div class="card-header-action" role="group" aria-label="Basic example" id="group-btn">
@@ -43,16 +43,12 @@
                                             </button>
                                         </td>
                                         <td>
-                                            <?= $row['nama_siswa'] ?>
+                                            <b><?= $row['nama_siswa'] ?></b>
                                         </td>
                                     </tr>
                                     <?php
                                 }
-                            } else { ?>
-                                <tr>
-                                    <td colspan="3" class="text-center">Belum ada data</td>
-                                </tr>
-                            <?php } ?>
+                            } ?>
                         </tbody>
                     </table>
                 </div>
@@ -150,7 +146,10 @@
         $('#table-siswa').DataTable({
             paging: true,
             searching: true,
-            ordering: true
+            ordering: true,
+            language: {
+                emptyTable: "Tidak ada data tersedia"
+            }
         });
     });
     $('#btn-add').click(function () {

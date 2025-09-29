@@ -35,15 +35,33 @@ $routes->get('/', 'Login::index');
 $routes->post('/' . bin2hex('auth'), 'Login::auth');
 $routes->get('/' . bin2hex('logout'), 'Login::logout');
 
+//SISWA
 $routes->get('/' . bin2hex('home'), 'Home::index');
 $routes->post('/' . bin2hex('siswa') . '/' . bin2hex('add'), 'Home::ac_add');
 $routes->post('/' . bin2hex('siswa') . '/' . bin2hex('update'), 'Home::ac_update');
 $routes->post('/' . bin2hex('siswa') . '/' . bin2hex('delete'), 'Home::ac_delete');
 
+//MAPEL
+$routes->get('/' . bin2hex('data-mapel'), 'Mapel::index');
+$routes->post('/' . bin2hex('mapel') . '/' . bin2hex('add'), 'Mapel::ac_add');
+$routes->post('/' . bin2hex('mapel') . '/' . bin2hex('update'), 'Mapel::ac_update');
+$routes->post('/' . bin2hex('mapel') . '/' . bin2hex('delete'), 'Mapel::ac_delete');
+
+//SOAL
+$routes->get('/' . bin2hex('data-soal'), 'Soal::index');
+
+// DRAFT
+$routes->get('/' . bin2hex('data-draft'), 'Soal::listDraft');
+$routes->post('/' . bin2hex('data-draft') . '/' . bin2hex('save'), 'Soal::saveDraft');
+$routes->get('/' . bin2hex('data-draft') . '/' . bin2hex('edit') . '/(:num)', 'Soal::editDraft/$1');
+$routes->post('/' . bin2hex('data-draft') . '/' . bin2hex('update'), 'Soal::updateDraft');
+$routes->post('/' . bin2hex('data-draft') . '/' . bin2hex('delete'), 'Soal::ac_delete');
+$routes->get('draft/publish/(:num)', 'Soal::publish/$1');
+
+
 $routes->get('/' . bin2hex('daftar-login'), 'ulangan::index');
 $routes->get('/' . bin2hex('reset-login'), 'ulangan::reset');
 $routes->get('/' . bin2hex('status-tes'), 'ulangan::status');
-$routes->get('/' . bin2hex('data-soal'), 'Soal::index');
 $routes->get('/' . bin2hex('hasil-ulangan'), 'Hasil::index');
 
 /*

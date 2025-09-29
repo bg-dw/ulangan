@@ -2,9 +2,9 @@
 <?= $this->section('content') ?>
 <div class="row">
     <div class="col-12">
-        <div class="card">
+        <div class="card card-primary">
             <div class="card-header">
-                <h4>Data Soal</h4>
+                <h4>Data Mata Pelajaran</h4>
                 <div class="card-header-action" role="group" aria-label="Basic example" id="group-btn">
                     <button type="button" class="btn btn-primary" id="btn-add">
                         <i class="fas fa-plus"></i> Tambah
@@ -13,69 +13,54 @@
             </div>
             <div class="card-body" id="tbl-data">
                 <div class="table-responsive">
-                    <table class="table table-striped" id="table-siswa">
+                    <table class="table table-striped" id="table-mapel">
                         <thead>
                             <tr>
                                 <th class="text-center">
                                     No.
                                 </th>
                                 <th class="text-center">Aksi</th>
-                                <th class="text-center">Nama</th>
+                                <th class="text-center">Mapel</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php $i = 1;
-                            if (isset($siswa) && count($siswa) > 0) {
-                                foreach ($siswa as $row) {
+                            if (isset($mapel) && count($mapel) > 0) {
+                                foreach ($mapel as $row) {
                                     ?>
                                     <tr>
                                         <td class="text-center" style="width: 7%">
                                             <?= $i++ . "."; ?>
                                         </td>
                                         <td class="text-center" style="width: 13%">
-                                            <button class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit Siswa"
-                                                onclick="update_siswa('<?= $row['id_siswa'] ?>','<?= $row['nama_siswa'] ?>','<?= $row['jk'] ?>')">
+                                            <button class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit mapel"
+                                                onclick="update_mapel('<?= $row['id_mapel'] ?>','<?= $row['mapel'] ?>')">
                                                 <i class="fas fa-pen"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-danger" data-toggle="tooltip" title="Hapus Siswa"
-                                                onclick="hapus('<?= $row['id_siswa'] ?>','<?= $row['nama_siswa'] ?>')">
+                                            <button class="btn btn-sm btn-danger" data-toggle="tooltip" title="Hapus mapel"
+                                                onclick="hapus('<?= $row['id_mapel'] ?>','<?= $row['mapel'] ?>')">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </td>
                                         <td>
-                                            <?= $row['nama_siswa'] ?>
+                                            <b><?= $row['mapel'] ?></b>
                                         </td>
                                     </tr>
                                     <?php
                                 }
-                            } else { ?>
-                                <tr>
-                                    <td colspan="3" class="text-center">Belum ada data</td>
-                                </tr>
-                            <?php } ?>
+                            } ?>
                         </tbody>
                     </table>
                 </div>
             </div>
             <div class="card-body" id="f-add" style="display:none;">
-                <form action="<?= base_url('/' . bin2hex('siswa') . '/' . bin2hex('add')) ?>" method="post"
+                <form action="<?= base_url('/' . bin2hex('mapel') . '/' . bin2hex('add')) ?>" method="post"
                     onsubmit="return confirm('Simpan Data?')">
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <label for="inp-nama">Nama Siswa</label>
-                            <input type="text" name="nama" class="form-control" id="inp-nama" placeholder="Midas"
+                            <label for="inp-mapel">Mata Pelajaran</label>
+                            <input type="text" name="mapel" class="form-control" id="inp-mapel" placeholder="Midas"
                                 required>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label>Jenis Kelamin</label><br>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" name="jk" type="radio" id="jk-l" value="L" checked>
-                                <label class="form-check-label" for="jk-l">Laki - Laki</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" name="jk" type="radio" id="jk-p" value="P">
-                                <label class="form-check-label" for="jk-p">Perempuan</label>
-                            </div>
                         </div>
                     </div>
                     <div class="text-right">
@@ -85,25 +70,14 @@
                 </form>
             </div>
             <div class="card-body" id="f-update" style="display:none;">
-                <form action="<?= base_url('/' . bin2hex('siswa') . '/' . bin2hex('update')) ?>" method="post"
+                <form action="<?= base_url('/' . bin2hex('mapel') . '/' . bin2hex('update')) ?>" method="post"
                     onsubmit="return confirm('Simpan Data?')">
                     <div class="form-row">
                         <input type="hidden" name="id" id="u-inp-id" required>
                         <div class="form-group col-md-6">
-                            <label for="u-inp-nama">Nama Siswa</label>
-                            <input type="text" name="nama" class="form-control" id="u-inp-nama" placeholder="Midas"
+                            <label for="u-inp-mapel">Mata Pelajaran</label>
+                            <input type="text" name="mapel" class="form-control" id="u-inp-mapel" placeholder="Midas"
                                 required>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label>Jenis Kelamin</label><br>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" name="jk" type="radio" id="u-jk-l" value="L">
-                                <label class="form-check-label" for="u-jk-l">Laki - Laki</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" name="jk" type="radio" id="u-jk-p" value="P">
-                                <label class="form-check-label" for="u-jk-p">Perempuan</label>
-                            </div>
                         </div>
                     </div>
                     <div class="text-right">
@@ -125,16 +99,16 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="<?= base_url('/' . bin2hex('siswa') . '/' . bin2hex('delete')) ?>" method="post"
+            <form action="<?= base_url('/' . bin2hex('mapel') . '/' . bin2hex('delete')) ?>" method="post"
                 enctype="multipart/form-data">
                 <div class="modal-body">
                     <input type="hidden" name="id" class="form-control" required id="d-id">
                     <div class="form-group">
-                        <label>Nama Siswa</label>
-                        <input type="text" name="nama" class="form-control" disabled id="d-nama">
+                        <label>Mata Pelajaran</label>
+                        <input type="text" name="mapel" class="form-control" disabled id="d-mapel">
                     </div><br>
                     <center>
-                        <h4>Seluruh data yang berkaitan dengan Siswa diatas akan terhapus. Hapus data?</h4>
+                        <h4>Seluruh data yang berkaitan dengan mapel diatas akan terhapus. Hapus data?</h4>
                     </center>
                 </div>
                 <div class="modal-footer bg-whitesmoke br">
@@ -147,10 +121,13 @@
 </div>
 <script>
     $(document).ready(function () {
-        $('#table-siswa').DataTable({
+        $('#table-mapel').DataTable({
             paging: true,
             searching: true,
-            ordering: true
+            ordering: true,
+            language: {
+                emptyTable: "Tidak ada data tersedia"
+            }
         });
     });
     $('#btn-add').click(function () {
@@ -164,17 +141,12 @@
         $('#tbl-data').show('slow');
     });
 
-    function update_siswa(id, nama, jk) {
+    function update_mapel(id, mapel) {
         $('#tbl-data').hide('slow');
         $('#group-btn').hide('slow');
         $('#f-update').show('slow');
         $('#u-inp-id').val(id);
-        $('#u-inp-nama').val(nama);
-        if (jk == 'L') {
-            $('#u-jk-l').prop('checked', true);
-        } else {
-            $('#u-jk-p').prop('checked', true);
-        }
+        $('#u-inp-mapel').val(mapel);
     }
 
     function cancel() {
@@ -183,9 +155,9 @@
         $('#tbl-data').show('slow');
     }
 
-    function hapus(id, nama) {
+    function hapus(id, mapel) {
         $('#d-id').val(id);
-        $('#d-nama').val(nama);
+        $('#d-mapel').val(mapel);
         $('#delete-modal').appendTo('body').modal('show');
     }
 </script>

@@ -42,12 +42,19 @@ $segments = $uri->getSegments(); ?>
                 <i data-feather="book"></i><span>Data Mapel</span>
             </a>
         </li>
-        <li class="dropdown <?php if ($segments[0] === bin2hex('data-soal')) {
+        <li class="dropdown <?php if ($segments[0] === bin2hex('data-soal') || $segments[0] === bin2hex('data-draft')) {
             echo "active";
         } ?>">
-            <a href="<?= base_url('/' . bin2hex('data-soal')) ?>" class="nav-link">
-                <i data-feather="book-open"></i><span>Data Soal</span>
-            </a>
+            <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="book-open"></i><span>Data
+                    Soal</span></a>
+            <ul class="dropdown-menu">
+                <li class="<?php if ($segments[0] === bin2hex('data-soal')) {
+                    echo "active";
+                } ?>"><a class="nav-link" href="<?= base_url('/' . bin2hex('data-soal')) ?>">Publish</a></li>
+                <li class="<?php if ($segments[0] === bin2hex('data-draft')) {
+                    echo "active";
+                } ?>"><a class="nav-link" href="<?= base_url('/' . bin2hex('data-draft')) ?>">Draft</a></li>
+            </ul>
         </li>
         <li class="dropdown <?php if ($segments[0] === bin2hex('hasil-ulangan')) {
             echo "active";

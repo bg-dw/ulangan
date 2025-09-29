@@ -9,9 +9,9 @@
 </head>
 
 <body>
-    <!-- <div class="loader">
+    <div class="loader">
         <div class="spinner"></div>
-    </div> -->
+    </div>
     <div id="app d-print-none">
         <div class="main-wrapper main-wrapper-1">
             <div class="navbar-bg"></div>
