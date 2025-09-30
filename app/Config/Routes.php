@@ -35,17 +35,31 @@ $routes->get('/', 'Login::index');
 $routes->post('/' . bin2hex('auth'), 'Login::auth');
 $routes->get('/' . bin2hex('logout'), 'Login::logout');
 
+
+//DATA MASTER
 //SISWA
 $routes->get('/' . bin2hex('home'), 'Home::index');
 $routes->post('/' . bin2hex('siswa') . '/' . bin2hex('add'), 'Home::ac_add');
 $routes->post('/' . bin2hex('siswa') . '/' . bin2hex('update'), 'Home::ac_update');
 $routes->post('/' . bin2hex('siswa') . '/' . bin2hex('delete'), 'Home::ac_delete');
 
+//JUDUL
+$routes->get('/' . bin2hex('data-judul'), 'Judul::index');
+$routes->post('/' . bin2hex('data-judul') . '/' . bin2hex('add'), 'Judul::ac_add');
+$routes->post('/' . bin2hex('data-judul') . '/' . bin2hex('update'), 'Judul::ac_update');
+$routes->post('/' . bin2hex('data-judul') . '/' . bin2hex('delete'), 'Judul::ac_delete');
+
 //MAPEL
 $routes->get('/' . bin2hex('data-mapel'), 'Mapel::index');
 $routes->post('/' . bin2hex('mapel') . '/' . bin2hex('add'), 'Mapel::ac_add');
 $routes->post('/' . bin2hex('mapel') . '/' . bin2hex('update'), 'Mapel::ac_update');
 $routes->post('/' . bin2hex('mapel') . '/' . bin2hex('delete'), 'Mapel::ac_delete');
+
+//UJIAN
+$routes->get('/' . bin2hex('data-ujian'), 'Ujian::index');
+$routes->post('/' . bin2hex('data-ujian') . '/' . bin2hex('add'), 'Ujian::ac_add');
+$routes->post('/' . bin2hex('data-ujian') . '/' . bin2hex('update'), 'Ujian::ac_update');
+$routes->post('/' . bin2hex('data-ujian') . '/' . bin2hex('delete'), 'Ujian::ac_delete');
 
 //SOAL
 $routes->get('/' . bin2hex('data-soal'), 'Soal::index');

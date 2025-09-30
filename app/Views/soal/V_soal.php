@@ -43,7 +43,7 @@
                                         <?php endif; ?>
                                     </td>
                                     <td><?= esc($d['judul']) ?></td>
-                                    <td class="text-center"><span class="badge badge-primary"><?= esc($d['mapel']) ?></span>
+                                    <td><span class="badge badge-primary"><?= esc($d['mapel']) ?></span>
                                     </td>
                                     <td class="text-center"><span class="badge badge-<?php if ($d['status'] == "final") {
                                         echo "secondary";

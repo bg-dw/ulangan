@@ -14,8 +14,20 @@ class Ulangan extends BaseController
 
     public function index()
     {
-        $data['title'] = 'Beranda';
+        $data['title'] = 'Ulangan';
         $data['siswa'] = $this->siswa->findAll();
         return view('V_ulangan_daftar', $data);
+    }
+    public function reset()
+    {
+        $data['title'] = 'Reset Login';
+        $data['siswa'] = $this->siswa->findAll();
+        return view('V_ulangan_reset', $data);
+    }
+    public function status()
+    {
+        $data['title'] = 'Status Login';
+        $data['siswa'] = $this->siswa->findAll();
+        return view('V_ulangan_status', $data);
     }
 }

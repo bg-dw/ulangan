@@ -20,8 +20,7 @@ $segments = $uri->getSegments(); ?>
         <li class="dropdown <?php if ($segments[0] === bin2hex('daftar-login') || $segments[0] === bin2hex('reset-login') || $segments[0] === bin2hex('status-tes')) {
             echo "active";
         } ?>">
-            <a href="#" class="menu-toggle nav-link has-dropdown"><i
-                    data-feather="file-text"></i><span>Ulangan</span></a>
+            <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="file-text"></i><span>Ujian</span></a>
             <ul class="dropdown-menu">
                 <li class="<?php if ($segments[0] === bin2hex('daftar-login')) {
                     echo "active";
@@ -29,12 +28,19 @@ $segments = $uri->getSegments(); ?>
                 <li class="<?php if ($segments[0] === bin2hex('reset-login')) {
                     echo "active";
                 } ?>"><a class="nav-link" href="<?= base_url('/' . bin2hex('reset-login')) ?>">Reset Login</a></li>
-                <li class="<?php if ($segments[0] === bin2hex('admin') && $segments[1] === bin2hex('status-tes')) {
+                <li class="<?php if ($segments[0] === bin2hex('status-tes')) {
                     echo "active";
                 } ?>"><a class="nav-link" href="<?= base_url('/' . bin2hex('status-tes')) ?>">Status tes</a></li>
             </ul>
         </li>
         <li class="menu-header">Data Master</li>
+        <li class="dropdown <?php if ($segments[0] === bin2hex('data-judul')) {
+            echo "active";
+        } ?>">
+            <a href="<?= base_url('/' . bin2hex('data-judul')) ?>" class="nav-link">
+                <i data-feather="paperclip"></i><span>Data Judul</span>
+            </a>
+        </li>
         <li class="dropdown <?php if ($segments[0] === bin2hex('data-mapel')) {
             echo "active";
         } ?>">
@@ -42,7 +48,14 @@ $segments = $uri->getSegments(); ?>
                 <i data-feather="book"></i><span>Data Mapel</span>
             </a>
         </li>
-        <li class="dropdown <?php if ($segments[0] === bin2hex('data-soal') || $segments[0] === bin2hex('data-draft')) {
+        <li class="dropdown <?php if ($segments[0] === bin2hex('data-ujian')) {
+            echo "active";
+        } ?>">
+            <a href="<?= base_url('/' . bin2hex('data-ujian')) ?>" class="nav-link">
+                <i data-feather="briefcase"></i><span>Data Ujian</span>
+            </a>
+        </li>
+        <li class="dropdown <?php if ($segments[0] === bin2hex('data-soal')) {
             echo "active";
         } ?>">
             <a href="<?= base_url('/' . bin2hex('data-soal')) ?>" class="nav-link">
