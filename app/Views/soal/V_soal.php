@@ -37,7 +37,7 @@
                                                 <i class="fas fa-pen"></i>
                                             </button>
                                             <button class="btn btn-sm btn-danger" data-toggle="tooltip" title="Hapus Soal"
-                                                onclick="hapus('<?= $d['id_soal'] ?>','<?= $d['judul'] ?>')">
+                                                onclick="hapus('<?= $d['id_soal'] ?>')">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         <?php endif; ?>
@@ -74,16 +74,12 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="<?= base_url('/' . bin2hex('data-draft') . '/' . bin2hex('delete')) ?>" method="post"
+            <form action="<?= base_url('/' . bin2hex('data-soal') . '/' . bin2hex('delete')) ?>" method="post"
                 enctype="multipart/form-data">
                 <div class="modal-body">
                     <input type="hidden" name="id" class="form-control" required id="d-id">
-                    <div class="form-group">
-                        <label>Judul</label>
-                        <input type="text" class="form-control" disabled id="d-judul">
-                    </div><br>
                     <center>
-                        <h4>Hapus draft?</h4>
+                        <h4>Hapus data terpilih?</h4>
                     </center>
                 </div>
                 <div class="modal-footer bg-whitesmoke br">
@@ -106,9 +102,8 @@
         });
     });
 
-    function hapus(id, judul) {
+    function hapus(id) {
         $('#d-id').val(id);
-        $('#d-judul').val(judul);
         $('#delete-modal').appendTo('body').modal('show');
     }
 </script>

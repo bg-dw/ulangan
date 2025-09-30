@@ -4,23 +4,22 @@
     <div class="col-12">
         <div class="card card-primary">
             <div class="card-header">
-                <h4>Edit Draft:</h4>
+                <h4>Edit Draft</h4>
             </div>
             <div class="card-body">
-                <form action="<?= base_url('/' . bin2hex('data-draft') . '/' . bin2hex('update')) ?>" method="post">
+                <form id="draftForm" action="<?= base_url('/' . bin2hex('data-draft') . '/' . bin2hex('update')) ?>"
+                    method="post">
                     <input type="hidden" name="id-soal" value="<?= esc($draft['id_soal']) ?>" required>
-                    <input type="hidden" name="id-mapel" value="<?= esc($draft['data']['id-mapel']) ?>" required>
+                    <input type="hidden" name="id-ujian" value="<?= esc($draft['id_ujian']) ?>" required>
+                    <input type="hidden" name="status" id="formStatus" value="draft">
                     <div class="form-row">
                         <div class="form-group col-md-12">
-                            <label>Judul</label>
-                            <input type="text" class="form-control" name="judul" value="<?= esc($draft['judul']) ?>"
-                                placeholder="Ulangan Harian" readonly required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-12">
-                            <label>Mapel</label>
-                            <input type="text" class="form-control" value="<?= $draft['mapel'] ?>" disabled>
+                            <label>Ujian</label>
+                            <select class="form-control" disabled>
+                                <option>
+                                    <?= $draft['ujian']['judul'] . " - " . $draft['ujian']['mapel'] . " [ " . $draft['ujian']['tgl'] . " ]" ?>
+                                </option>
+                            </select>
                         </div>
                     </div>
                     <!-- konfigurasi soal -->
@@ -55,8 +54,9 @@
                     <!-- field soal hasil generate -->
                     <div class="mt-4" id="generatedFields"></div>
 
-                    <div class="mt-3">
-                        <button type="submit" class="btn btn-success">Update Draft</button>
+                    <div class="text-right mt-3">
+                        <button type="submit" class="btn btn-warning" id="btnUpdate">Update Draft</button>
+                        <button type="button" class="btn btn-primary" id="btnFinal">Simpan Final</button>
                         <a href="<?= base_url('/' . bin2hex('data-soal')) ?>" class="btn btn-secondary">Kembali</a>
                     </div>
                 </form>
@@ -134,7 +134,7 @@
                 wrapper.className = 'mb-3 p-3 border rounded';
 
                 wrapper.innerHTML = `
-                <label class="fw-bold">Soal ${soalCounter} (${jenis.replace("_", " ")})</label>
+                <label class="fw-bold"><strong>Soal ${soalCounter} (${jenis.replace("_", " ")})</strong></label>
                 <textarea class="form-control mb-2" name="pertanyaan[${groupIndex}][]">${escapeHtml(qText)}</textarea>
             `;
 
@@ -145,7 +145,7 @@
                         const val = opsiForSoal[oi] || '';
                         wrapper.innerHTML += `
                         <div class="input-group mb-1">
-                            <span class="input-group-text text-uppercase">${letter}.</span>
+                            <span class="input-group-text text-uppercase"><strong>${letter}.</strong></span>
                             <input type="text" class="form-control"
                                 name="opsi[${groupIndex}][${si}][]"
                                 placeholder="Pilihan ${letter.toUpperCase()}"
@@ -156,8 +156,8 @@
 
                     const savedKunci = kForGroup[si] || '';
                     wrapper.innerHTML += `
-                    <label class="mt-2">Kunci Jawaban</label>
-                    <select class="form-control mb-1" name="kunci[${groupIndex}][]">
+                    <label class="mt-2"><strong>Kunci Jawaban</strong></label>
+                    <select class="form-control mb-1 col-md-1" name="kunci[${groupIndex}][]">
                         ${['a', 'b', 'c', 'd'].map(opt => `
                             <option value="${opt}" ${savedKunci === opt ? 'selected' : ''}>${opt.toUpperCase()}</option>
                         `).join('')}
@@ -167,12 +167,12 @@
                     const savedKunci = kForGroup[si] || '';
                     if (jenis === 'uraian') {
                         wrapper.innerHTML += `
-                        <label class="mt-2">Panduan / Kunci Jawaban</label>
+                        <label class="mt-2"><strong>Panduan / Kunci Jawaban</strong></label>
                         <textarea class="form-control" name="kunci[${groupIndex}][]">${escapeHtml(savedKunci)}</textarea>
                     `;
                     } else {
                         wrapper.innerHTML += `
-                        <label class="mt-2">Kunci Jawaban</label>
+                        <label class="mt-2"><strong>Kunci Jawaban</strong></label>
                         <input type="text" class="form-control" name="kunci[${groupIndex}][]" value="${escapeAttr(savedKunci)}">
                     `;
                     }
@@ -189,6 +189,43 @@
     document.addEventListener('DOMContentLoaded', function () {
         console.log('draftData', draftData);
         generateSoalFieldFromDraft(draftData);
+
+        const form = document.getElementById("draftForm");
+        const statusInput = document.getElementById("formStatus");
+
+        // validasi semua input dan textarea
+        function validateForm() {
+            let isValid = true;
+            const fields = form.querySelectorAll("input[name], textarea[name], select[name]");
+            fields.forEach(el => {
+                // skip hidden
+                if (el.type === "hidden" || el.disabled) return;
+
+                if (!el.value.trim()) {
+                    el.classList.add("is-invalid");
+                    isValid = false;
+                } else {
+                    el.classList.remove("is-invalid");
+                }
+            });
+            return isValid;
+        }
+
+        // tombol simpan final
+        document.getElementById("btnFinal").addEventListener("click", function () {
+            if (!validateForm()) {
+                alert("Masih ada field yang kosong. Harap lengkapi semua isian sebelum finalisasi.");
+                return;
+            }
+            form.action = "<?= base_url('/' . bin2hex('data-draft') . '/' . bin2hex('final')) ?>";
+            statusInput.value = "final";
+            form.submit();
+        });
+
+        // tombol update draft → biarkan default
+        document.getElementById("btnUpdate").addEventListener("click", function () {
+            statusInput.value = "draft";
+        });
     });
 
 </script>

@@ -7,16 +7,12 @@
                 <form action="<?= base_url('/' . bin2hex('soal') . '/' . bin2hex('add')) ?>" method="post">
                     <div class="form-row">
                         <div class="form-group col-md-12">
-                            <label for="">Judul</label>
-                            <input type="text" class="form-control" name="judul" placeholder="Ulangan Harian" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-12">
-                            <label for="sel-mapel">Mapel</label>
-                            <select class="form-control" name="id-mapel" id="sel-mapel" required>
-                                <?php foreach ($mapel as $row): ?>
-                                    <option value="<?= $row['id_mapel'] ?>"><?= $row['mapel'] ?></option>
+                            <label for="sel-ujian">Ujian</label>
+                            <select class="form-control" name="id-ujian" id="sel-ujian" required>
+                                <?php foreach ($ujian as $row): ?>
+                                    <option value="<?= $row['id_ujian'] ?>">
+                                        <?= $row['judul'] . " - " . $row['mapel'] . " [ " . $row['tgl'] . " ]" ?>
+                                    </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -101,36 +97,18 @@
                 .text("-");
 
             refreshOptions();
-            hitungTotal();
         });
 
         // hapus field
         $(document).on("click", ".btn-remove", function () {
             $(this).closest(".input-row").remove();
             refreshOptions();
-            hitungTotal();
         });
 
         // kalau option berubah
         $(document).on("change", ".jenis-soal", function () {
             refreshOptions();
         });
-
-        // ketika jumlah soal atau bobot berubah
-        $(document).on("input", ".jumlah-soal, .bobot", function () {
-            hitungTotal();
-        });
-
-        // fungsi hitung total poin
-        function hitungTotal() {
-            let total = 0;
-
-            $(".input-row").each(function () {
-                let jumlah = parseInt($(this).find(".jumlah-soal").val()) || 0;
-                let bobot = parseInt($(this).find(".bobot").val()) || 0;
-                total += jumlah * bobot;
-            });
-        }
 
         // 🔑 refresh semua select supaya hanya menampilkan option yang belum dipakai
         function refreshOptions() {
@@ -165,7 +143,6 @@
 
         // panggil pertama kali
         refreshOptions();
-        hitungTotal();
         $(document).on("click", "#btn-generate", function () {
             $("#generatedFields").empty(); // reset dulu (biar tidak double)
 
@@ -188,25 +165,25 @@
                     if (jenis === "pilihan_ganda") {
                         field += `
                                 <div class="input-group mb-1">
-                                    <span class="input-group-text text-uppercase">A.</span>
+                                    <span class="input-group-text text-uppercase"><strong>A.</strong></span>
                                     <input type="text" class="form-control"
                                         name="jawaban[${rowIndex}][${i}][a]"
                                         placeholder="Pilihan A">
                                 </div>
                                 <div class="input-group mb-1">
-                                    <span class="input-group-text text-uppercase">B.</span>
+                                    <span class="input-group-text text-uppercase"><strong>B.</strong></span>
                                     <input type="text" class="form-control"
                                         name="jawaban[${rowIndex}][${i}][b]"
                                         placeholder="Pilihan B">
                                 </div>
                                 <div class="input-group mb-1">
-                                    <span class="input-group-text text-uppercase">C.</span>
+                                    <span class="input-group-text text-uppercase"><strong>C.</strong></span>
                                     <input type="text" class="form-control"
                                         name="jawaban[${rowIndex}][${i}][c]"
                                         placeholder="Pilihan C">
                                 </div>
                                 <div class="input-group mb-1">
-                                    <span class="input-group-text text-uppercase">D.</span>
+                                    <span class="input-group-text text-uppercase"><strong>D.</strong></span>
                                     <input type="text" class="form-control"
                                         name="jawaban[${rowIndex}][${i}][d]"
                                         placeholder="Pilihan D">
@@ -273,7 +250,7 @@
             // field inti
             const requiredFields = [
                 { selector: "input[name='judul']", message: "Judul harus diisi" },
-                { selector: "select[name='id-mapel']", message: "Mapel harus dipilih" },
+                { selector: "select[name='id-ujian']", message: "ujian harus dipilih" },
                 { selector: "select.jenis-soal", message: "Jenis soal harus dipilih" },
                 { selector: "input.jumlah-soal", message: "Jumlah soal harus diisi" },
                 { selector: "input.bobot", message: "Bobot harus diisi" }

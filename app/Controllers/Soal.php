@@ -2,17 +2,17 @@
 
 namespace App\Controllers;
 use App\Models\M_soal;
-use App\Models\M_mapel;
+use App\Models\M_ujian;
 
 class Soal extends BaseController
 {
-    protected $soal, $mapel;
+    protected $soal, $ujian;
 
     public function __construct()
     {
         $this->is_session_available();
         $this->soal = new M_soal();
-        $this->mapel = new M_mapel();
+        $this->ujian = new M_ujian();
     }
 
     public function index()
@@ -26,7 +26,7 @@ class Soal extends BaseController
     function add_soal()
     {
         $data['title'] = 'Buat Soal';
-        $data['mapel'] = $this->mapel->findAll();
+        $data['ujian'] = $this->ujian->get_list();
         return view('soal/V_soal_add', $data);
     }
 
@@ -36,11 +36,8 @@ class Soal extends BaseController
 
         $errors = [];
 
-        if (empty($data['judul'])) {
-            $errors['judul'] = 'Judul harus diisi';
-        }
-        if (empty($data['id-mapel'])) {
-            $errors['id-mapel'] = 'Mapel harus dipilih';
+        if (empty($data['id-ujian'])) {
+            $errors['id-ujian'] = 'ujian harus dipilih';
         }
 
         // cek setiap pertanyaan
@@ -85,13 +82,11 @@ class Soal extends BaseController
             ]);
         }
 
-        $judul = $this->request->getPost('judul');
-        $idMapel = $this->request->getPost('id-mapel');
+        $id_ujian = $this->request->getPost('id-ujian');
         //simpan ke database
         $this->soal->save([
             'id_guru' => session()->get('id'),
-            'id_mapel' => $idMapel,
-            'judul' => $judul,
+            'id_ujian' => $id_ujian,
             'data' => json_encode($this->request->getPost()),
             'status' => 'final',
             'updated_at' => date('Y-m-d H:i:s')
@@ -110,17 +105,11 @@ class Soal extends BaseController
     public function saveDraft()
     {
         $userId = session()->get('id');
-        $judul = $this->request->getPost('judul');
-        $idMapel = $this->request->getPost('id-mapel');
-
-        if (!$judul) {
-            return $this->response->setJSON(['status' => 'error', 'msg' => 'Judul wajib diisi']);
-        }
+        $idujian = $this->request->getPost('id-ujian');
 
         $this->soal->save([
             'id_guru' => $userId,
-            'id_mapel' => $idMapel,
-            'judul' => $judul,
+            'id_ujian' => $idujian,
             'data' => json_encode($this->request->getPost()),
             'status' => 'draft',
             'updated_at' => date('Y-m-d H:i:s')
@@ -137,10 +126,9 @@ class Soal extends BaseController
         }
 
         $draft['data'] = json_decode($draft['data'], true);
-        $id_mapel = $draft['data']['id-mapel'];
-        $mapel = $this->mapel->where('id_mapel', $id_mapel)->first();
-        $draft['mapel'] = $mapel['mapel'];
-        return view('soal/draft_edit', ['draft' => $draft]);
+        $id_ujian = $draft['id_ujian'];
+        $draft['ujian'] = $this->ujian->get_ujian($id_ujian);
+        return view('soal/V_soal_edit', ['draft' => $draft]);
     }
 
     public function updateDraft()
@@ -158,15 +146,30 @@ class Soal extends BaseController
         return redirect()->route(bin2hex('data-soal'));
     }
 
+    public function finalDraft()
+    {
+        $idDraft = $this->request->getPost('id-soal');
+
+        $send = $this->soal->update($idDraft, [
+            'data' => json_encode($this->request->getPost())
+        ]);
+        if ($send) {
+            session()->setFlashdata('success', ' Data FINAL berhasil disimpan.');
+        } else {
+            session()->setFlashdata('warning', ' Gagal menyimpan data!');
+        }
+        return redirect()->route(bin2hex('data-soal'));
+    }
+
     //delete draft
     public function ac_delete()
     {
-        $send = $this->soal->where('id_draft', $this->request->getVar('id'))->delete();
+        $send = $this->soal->where('id_soal', $this->request->getVar('id'))->delete();
         if ($send):
             session()->setFlashdata('success', ' Data berhasil dihapus.');
         else:
             session()->setFlashdata('warning', ' Data gagal dihapus.');
         endif;
-        return redirect()->route(bin2hex('data-draft'));
+        return redirect()->route(bin2hex('data-soal'));
     }
 }

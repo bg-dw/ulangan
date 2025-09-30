@@ -27,4 +27,13 @@ class M_ujian extends Model
         $this->orderBy('tbl_ujian.updated_at', 'DESC');
         return $this->findAll();
     }
+
+    function get_ujian($id)
+    {
+        $this->select('tbl_ujian.tgl,tbl_judul.judul,tbl_mapel.mapel');
+        $this->join('tbl_mapel', 'tbl_ujian.id_mapel = tbl_mapel.id_mapel');
+        $this->join('tbl_judul', 'tbl_ujian.id_judul = tbl_judul.id_judul');
+        $this->where('tbl_ujian.id_ujian', $id);
+        return $this->first();
+    }
 }
