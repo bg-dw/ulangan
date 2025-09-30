@@ -49,15 +49,14 @@ $routes->post('/' . bin2hex('mapel') . '/' . bin2hex('delete'), 'Mapel::ac_delet
 
 //SOAL
 $routes->get('/' . bin2hex('data-soal'), 'Soal::index');
+$routes->get('/' . bin2hex('data-soal') . '/' . bin2hex('add'), 'Soal::add_soal');
+$routes->post('/' . bin2hex('data-soal') . '/' . bin2hex('save'), 'Soal::saveSoal');
 
 // DRAFT
-$routes->get('/' . bin2hex('data-draft'), 'Soal::listDraft');
 $routes->post('/' . bin2hex('data-draft') . '/' . bin2hex('save'), 'Soal::saveDraft');
 $routes->get('/' . bin2hex('data-draft') . '/' . bin2hex('edit') . '/(:num)', 'Soal::editDraft/$1');
 $routes->post('/' . bin2hex('data-draft') . '/' . bin2hex('update'), 'Soal::updateDraft');
 $routes->post('/' . bin2hex('data-draft') . '/' . bin2hex('delete'), 'Soal::ac_delete');
-$routes->get('draft/publish/(:num)', 'Soal::publish/$1');
-
 
 $routes->get('/' . bin2hex('daftar-login'), 'ulangan::index');
 $routes->get('/' . bin2hex('reset-login'), 'ulangan::reset');

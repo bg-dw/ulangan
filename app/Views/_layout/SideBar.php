@@ -26,7 +26,7 @@ $segments = $uri->getSegments(); ?>
                 <li class="<?php if ($segments[0] === bin2hex('daftar-login')) {
                     echo "active";
                 } ?>"><a class="nav-link" href="<?= base_url('/' . bin2hex('daftar-login')) ?>">Daftar Login</a></li>
-                <li class="<?php if ($segments[0] === bin2hex('daftar-login')) {
+                <li class="<?php if ($segments[0] === bin2hex('reset-login')) {
                     echo "active";
                 } ?>"><a class="nav-link" href="<?= base_url('/' . bin2hex('reset-login')) ?>">Reset Login</a></li>
                 <li class="<?php if ($segments[0] === bin2hex('admin') && $segments[1] === bin2hex('status-tes')) {
@@ -45,16 +45,9 @@ $segments = $uri->getSegments(); ?>
         <li class="dropdown <?php if ($segments[0] === bin2hex('data-soal') || $segments[0] === bin2hex('data-draft')) {
             echo "active";
         } ?>">
-            <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="book-open"></i><span>Data
-                    Soal</span></a>
-            <ul class="dropdown-menu">
-                <li class="<?php if ($segments[0] === bin2hex('data-soal')) {
-                    echo "active";
-                } ?>"><a class="nav-link" href="<?= base_url('/' . bin2hex('data-soal')) ?>">Publish</a></li>
-                <li class="<?php if ($segments[0] === bin2hex('data-draft')) {
-                    echo "active";
-                } ?>"><a class="nav-link" href="<?= base_url('/' . bin2hex('data-draft')) ?>">Draft</a></li>
-            </ul>
+            <a href="<?= base_url('/' . bin2hex('data-soal')) ?>" class="nav-link">
+                <i data-feather="book-open"></i><span>Data Soal</span>
+            </a>
         </li>
         <li class="dropdown <?php if ($segments[0] === bin2hex('hasil-ulangan')) {
             echo "active";

@@ -8,7 +8,7 @@
             </div>
             <div class="card-body">
                 <form action="<?= base_url('/' . bin2hex('data-draft') . '/' . bin2hex('update')) ?>" method="post">
-                    <input type="hidden" name="id_draft" value="<?= esc($draft['id_draft']) ?>" required>
+                    <input type="hidden" name="id-soal" value="<?= esc($draft['id_soal']) ?>" required>
                     <input type="hidden" name="id-mapel" value="<?= esc($draft['data']['id-mapel']) ?>" required>
                     <div class="form-row">
                         <div class="form-group col-md-12">
@@ -57,7 +57,7 @@
 
                     <div class="mt-3">
                         <button type="submit" class="btn btn-success">Update Draft</button>
-                        <a href="<?= base_url('/' . bin2hex('data-draft')) ?>" class="btn btn-secondary">Kembali</a>
+                        <a href="<?= base_url('/' . bin2hex('data-soal')) ?>" class="btn btn-secondary">Kembali</a>
                     </div>
                 </form>
             </div>
@@ -110,43 +110,39 @@
     function generateSoalFieldFromDraft(data) {
         const container = document.getElementById('generatedFields');
         container.innerHTML = '';
-
         if (!data) return;
 
-        const jenisArr = toArrayMaybe(data.jenis_soal || data.jenis || []);
-        const jumlahArr = toArrayMaybe(data.jumlah_soal || data.jumlah || []);
-        const pertGroups = buildNestedGroups(data.pertanyaan || []);
-        const opsiGroups = buildNestedGroups(data.opsi || data.option || data.pilihan || []);
-        const kunciGroups = buildNestedGroups(data.kunci || []);
+        const jenisArr = data.jenis_soal || [];
+        const jumlahArr = data.jumlah_soal || [];
+        const pertGroups = data.pertanyaan || [];
+        const opsiGroups = data.opsi || [];
+        const kunciGroups = data.kunci || [];
 
-        let soalCounter = 1; // counter global
+        let soalCounter = 1;
 
         jenisArr.forEach((jenis, groupIndex) => {
             const savedQuestions = pertGroups[groupIndex] || [];
-            let count = savedQuestions.length;
-            if (count === 0) {
-                const j = parseInt(jumlahArr[groupIndex]);
-                count = isNaN(j) ? 0 : j;
-            }
+            const opsiForGroup = opsiGroups[groupIndex] || [];
+            const kForGroup = kunciGroups[groupIndex] || [];
+
+            let count = savedQuestions.length || parseInt(jumlahArr[groupIndex]) || 0;
             if (count <= 0) return;
 
             for (let si = 0; si < count; si++) {
-                const qText = savedQuestions[si] ?? savedQuestions[si + 1] ?? '';
+                const qText = savedQuestions[si] || '';
                 const wrapper = document.createElement('div');
                 wrapper.className = 'mb-3 p-3 border rounded';
 
                 wrapper.innerHTML = `
-                <label class="fw-bold"><strong>Soal ${soalCounter} (${String(jenis).replace("_", " ")})</strong></label>
+                <label class="fw-bold">Soal ${soalCounter} (${jenis.replace("_", " ")})</label>
                 <textarea class="form-control mb-2" name="pertanyaan[${groupIndex}][]">${escapeHtml(qText)}</textarea>
             `;
 
-                if (String(jenis) === 'pilihan_ganda') {
-                    const opsiForGroup = opsiGroups[groupIndex] || [];
-                    const opsiForSoal = opsiForGroup[si] || opsiForGroup[si + 1] || [];
+                if (jenis === 'pilihan_ganda') {
+                    const opsiForSoal = opsiForGroup[si] || [];
 
-                    for (let oi = 0; oi < 4; oi++) {
-                        const letter = String.fromCharCode(97 + oi);
-                        const val = opsiForSoal[oi] ?? '';
+                    ['a', 'b', 'c', 'd'].forEach((letter, oi) => {
+                        const val = opsiForSoal[oi] || '';
                         wrapper.innerHTML += `
                         <div class="input-group mb-1">
                             <span class="input-group-text text-uppercase">${letter}.</span>
@@ -156,43 +152,38 @@
                                 value="${escapeAttr(val)}">
                         </div>
                     `;
-                    }
+                    });
 
-                    const kForGroup = kunciGroups[groupIndex] || [];
-                    const savedKunci = kForGroup[si] ?? kForGroup[si + 1] ?? '';
+                    const savedKunci = kForGroup[si] || '';
                     wrapper.innerHTML += `
                     <label class="mt-2">Kunci Jawaban</label>
-                                <select class="form-control mb-1" name="kunci[${groupIndex}][]">
+                    <select class="form-control mb-1" name="kunci[${groupIndex}][]">
                         ${['a', 'b', 'c', 'd'].map(opt => `
-                            <option value="${opt}" ${savedKunci === opt ? 'selected' : ''}>
-                                ${opt.toUpperCase()}
-                            </option>
+                            <option value="${opt}" ${savedKunci === opt ? 'selected' : ''}>${opt.toUpperCase()}</option>
                         `).join('')}
                     </select>
                 `;
-                } else if (String(jenis) === 'isian' || String(jenis) === 'uraian') {
-                    const kForGroup = kunciGroups[groupIndex] || [];
-                    const savedKunci = kForGroup[si] ?? kForGroup[si + 1] ?? '';
-                    if (String(jenis) === 'uraian') {
+                } else if (jenis === 'isian' || jenis === 'uraian') {
+                    const savedKunci = kForGroup[si] || '';
+                    if (jenis === 'uraian') {
                         wrapper.innerHTML += `
                         <label class="mt-2">Panduan / Kunci Jawaban</label>
-                        <textarea class="form-control" name="kunci[${groupIndex}][]"
-                          placeholder="Kunci jawaban">${escapeHtml(savedKunci)}</textarea>
+                        <textarea class="form-control" name="kunci[${groupIndex}][]">${escapeHtml(savedKunci)}</textarea>
                     `;
                     } else {
                         wrapper.innerHTML += `
                         <label class="mt-2">Kunci Jawaban</label>
-                        <input type="text" class="form-control" name="kunci[${groupIndex}][]"
-                          placeholder="Kunci jawaban" value="${escapeAttr(savedKunci)}">
+                        <input type="text" class="form-control" name="kunci[${groupIndex}][]" value="${escapeAttr(savedKunci)}">
                     `;
                     }
                 }
 
                 container.appendChild(wrapper);
-                soalCounter++; // increment global
+                soalCounter++;
             }
         });
     }
+
 
     /** run on DOM ready */
     document.addEventListener('DOMContentLoaded', function () {
