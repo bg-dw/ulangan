@@ -35,24 +35,40 @@
                                         <td class="text-center" style="width: 7%">
                                             <?= $i++ . "."; ?>
                                         </td>
-                                        <td class="text-center" style="width: 13%">
-                                            <button class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit ujian"
-                                                onclick="update_ujian('<?= $row['id_ujian'] ?>','<?= $row['id_judul'] ?>','<?= $row['id_mapel'] ?>','<?= $row['tgl'] ?>')">
-                                                <i class="fas fa-pen"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-danger" data-toggle="tooltip" title="Hapus ujian"
-                                                onclick="hapus('<?= $row['id_ujian'] ?>')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                        <td class="text-center aksi-col-<?= $row['id_ujian'] ?>" style="width: 13%">
+                                            <?php if ($row['status'] == 'draft' || $row['status'] == 'final'): ?>
+                                                <button class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit ujian"
+                                                    onclick="update_ujian('<?= $row['id_ujian'] ?>','<?= $row['id_judul'] ?>','<?= $row['id_mapel'] ?>','<?= $row['tgl'] ?>')">
+                                                    <i class="fas fa-pen"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-danger" data-toggle="tooltip" title="Hapus ujian"
+                                                    onclick="hapus('<?= $row['id_ujian'] ?>')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            <?php else: ?>
+                                                <span class="badge badge-info">Tidak bisa diubah</span>
+                                            <?php endif; ?>
                                         </td>
+
                                         <td>
                                             <?= $row['judul'] ?>
                                         </td>
                                         <td><span class="badge badge-primary"><?= $row['mapel'] ?></span>
                                         </td>
-                                        <td class="text-center"><span
-                                                class="badge badge-secondary"><?= strtoupper($row['status']) ?></span>
+                                        <td class="text-center">
+                                            <select class="form-control form-control-sm status-select"
+                                                data-id="<?= $row['id_ujian'] ?>">
+                                                <option value="draft" <?= $row['status'] == 'draft' ? 'selected' : '' ?>>Draft
+                                                </option>
+                                                <option value="final" <?= $row['status'] == 'final' ? 'selected' : '' ?>>Final
+                                                </option>
+                                                <option value="dikerjakan" <?= $row['status'] == 'dikerjakan' ? 'selected' : '' ?>>
+                                                    Dikerjakan</option>
+                                                <option value="selesai" <?= $row['status'] == 'selesai' ? 'selected' : '' ?>>
+                                                    Selesai</option>
+                                            </select>
                                         </td>
+
                                         <td class="text-center">
                                             <?= $row['tgl'] ?>
                                         </td>
@@ -170,6 +186,54 @@
                 emptyTable: "Tidak ada data tersedia"
             }
         });
+
+        $(document).on("change", ".status-select", function () {
+            let select = $(this);
+            let idUjian = select.data("id");
+            let statusBaru = select.val();
+            let statusLama = select.find("option[selected]").val();
+
+            if (confirm("Apakah Anda yakin ingin mengubah status menjadi " + statusBaru.toUpperCase() + " ?")) {
+                $.ajax({
+                    url: "<?= base_url('/' . bin2hex('data-ujian') . '/' . bin2hex('update-status')) ?>",
+                    type: "POST",
+                    data: { id: idUjian, status: statusBaru },
+                    success: function (res) {
+                        alert("Status berhasil diperbarui!");
+
+                        // update option[selected]
+                        select.find("option").removeAttr("selected");
+                        select.find("option[value='" + statusBaru + "']").attr("selected", true);
+
+                        // === manipulasi tombol edit/hapus ===
+                        let aksiCol = $(".aksi-col-" + idUjian);
+
+                        if (statusBaru === "dikerjakan" || statusBaru === "selesai") {
+                            aksiCol.html('<span class="badge badge-info">Tidak bisa diubah</span>');
+                        } else {
+                            aksiCol.html(`
+                        <button class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit ujian"
+                            onclick="update_ujian('${idUjian}','dummy','dummy','2025-10-01')">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" data-toggle="tooltip" title="Hapus ujian"
+                            onclick="hapus('${idUjian}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    `);
+                        }
+                    },
+                    error: function () {
+                        alert("Gagal update status.");
+                        select.val(statusLama);
+                    }
+                });
+            } else {
+                select.val(statusLama);
+            }
+        });
+
+
     });
 
     $('#btn-add').click(function () {

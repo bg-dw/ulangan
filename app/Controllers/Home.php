@@ -65,4 +65,26 @@ class Home extends BaseController
 		endif;
 		return redirect()->route(bin2hex('home'));
 	}
+
+	public function updateStatus()
+	{
+		$id = $this->request->getPost('id');
+		$status = $this->request->getPost('status');
+
+		if (!in_array($status, ['enable', 'disable'])) {
+			return $this->response->setJSON([
+				'success' => false,
+				'message' => 'Status tidak valid'
+			]);
+		}
+
+		$this->siswa->update($id, [
+			'status_login' => $status
+		]);
+
+		return $this->response->setJSON([
+			'success' => true
+		]);
+	}
+
 }

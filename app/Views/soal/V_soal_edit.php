@@ -55,7 +55,9 @@
                     <div class="mt-4" id="generatedFields"></div>
 
                     <div class="text-right mt-3">
-                        <button type="submit" class="btn btn-warning" id="btnUpdate">Update Draft</button>
+                        <?php if ($draft['status'] != "final"): ?>
+                            <button type="submit" class="btn btn-warning" id="btnUpdate">Update Draft</button>
+                        <?php endif; ?>
                         <button type="button" class="btn btn-primary" id="btnFinal">Simpan Final</button>
                         <a href="<?= base_url('/' . bin2hex('data-soal')) ?>" class="btn btn-secondary">Kembali</a>
                     </div>

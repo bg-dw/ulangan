@@ -40,6 +40,14 @@ class Soal extends BaseController
             $errors['id-ujian'] = 'ujian harus dipilih';
         }
 
+        $cek = $this->soal->where('id_ujian', $data['id-ujian'])->first();
+        if ($cek) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'msg' => 'Data Ujian sudah pernah dibuat! '
+            ]);
+        }
+
         // cek setiap pertanyaan
         if (!empty($data['pertanyaan'])) {
             foreach ($data['pertanyaan'] as $rowIndex => $row) {
@@ -106,7 +114,13 @@ class Soal extends BaseController
     {
         $userId = session()->get('id');
         $idujian = $this->request->getPost('id-ujian');
-
+        $cek = $this->soal->where('id_ujian', $idujian)->first();
+        if ($cek) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'msg' => 'Data Ujian sudah pernah dibuat! '
+            ]);
+        }
         $this->soal->save([
             'id_guru' => $userId,
             'id_ujian' => $idujian,
@@ -151,7 +165,8 @@ class Soal extends BaseController
         $idDraft = $this->request->getPost('id-soal');
 
         $send = $this->soal->update($idDraft, [
-            'data' => json_encode($this->request->getPost())
+            'data' => json_encode($this->request->getPost()),
+            'status' => "final"
         ]);
         if ($send) {
             session()->setFlashdata('success', ' Data FINAL berhasil disimpan.');

@@ -1,21 +1,21 @@
 <?php
 
 namespace App\Controllers;
-use App\Models\M_siswa;
+use App\Models\M_ujian;
 
 class Hasil extends BaseController
 {
-    protected $siswa;
+    protected $ujian;
     public function __construct()
     {
         $this->is_session_available();
-        $this->siswa = new M_siswa();
+        $this->ujian = new M_ujian();
     }
 
     public function index()
     {
-        $data['title'] = 'Beranda';
-        $data['siswa'] = $this->siswa->findAll();
+        $data['title'] = 'Hasil';
+        $data['ujian'] = $this->ujian->get_list_hasil();
         return view('V_hasil', $data);
     }
 }

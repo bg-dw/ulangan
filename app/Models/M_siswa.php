@@ -12,6 +12,7 @@ class M_siswa extends Model
     protected $allowedFields = [
         'id_siswa',
         'nama_siswa',
-        'jk'
+        'jk',
+        'status_login'
     ];
 }

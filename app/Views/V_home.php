@@ -21,6 +21,7 @@
                                 </th>
                                 <th class="text-center">Aksi</th>
                                 <th class="text-center">Nama</th>
+                                <th class="text-center">Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -44,6 +45,12 @@
                                         </td>
                                         <td>
                                             <b><?= $row['nama_siswa'] ?></b>
+                                        </td>
+                                        <td class="text-center" style="width: 13%">
+                                            <span class="badge status-badge <?= $row['status_login'] == 'enable' ? 'badge-success' : 'badge-danger' ?>" data-id="<?= $row['id_siswa'] ?>"
+                                                data-status="<?= $row['status_login'] ?>">
+                                                <?= ucfirst($row['status_login']) ?>
+                                            </span>
                                         </td>
                                     </tr>
                                     <?php
@@ -151,6 +158,62 @@
                 emptyTable: "Tidak ada data tersedia"
             }
         });
+
+        $(document).on("click", ".status-badge", function () {
+            let $this = $(this);
+            let id = $this.data("id");
+            let currentStatus = $this.data("status");
+            let buttons = {
+                cancel: {
+                    text: "Batal",
+                    visible: true,
+                    className: "btn btn-secondary"
+                }
+            };
+
+            // jika status sekarang "enable", hanya tampilkan disable
+            if (currentStatus === "enable") {
+                buttons.disable = {
+                    text: "Disable",
+                    value: "disable",
+                    className: "btn btn-danger"
+                };
+            } else {
+                // kalau status "disable", hanya tampilkan enable
+                buttons.enable = {
+                    text: "Enable",
+                    value: "enable",
+                    className: "btn btn-success"
+                };
+            }
+
+            swal({
+                title: "Ubah Status",
+                text: "Pilih status baru untuk siswa ini",
+                icon: "warning",
+                buttons: buttons
+            }).then((value) => {
+                if (value) {
+                    $.post("<?= base_url('/' . bin2hex('siswa') . '/' . bin2hex('update-status')) ?>", {
+                        id: id,
+                        status: value
+                    }, function (res) {
+                        if (res.success) {
+                            $this.text(value.charAt(0).toUpperCase() + value.slice(1));
+                            $this.data("status", value);
+                            $this.removeClass("badge-success badge-danger");
+                            $this.addClass(value === "enable" ? "badge-success" : "badge-danger");
+
+                            swal("Berhasil", "Status berhasil diperbarui", "success");
+                        } else {
+                            swal("Gagal", res.message, "error");
+                        }
+                    }, "json");
+                }
+            });
+        });
+
+
     });
     $('#btn-add').click(function () {
         $('#tbl-data').hide('slow');

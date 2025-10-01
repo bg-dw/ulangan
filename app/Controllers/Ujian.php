@@ -102,4 +102,18 @@ class Ujian extends BaseController
         endif;
         return redirect()->route(bin2hex('data-ujian'));
     }
+
+    public function updateStatus()
+    {
+        $id = $this->request->getPost('id');
+        $status = $this->request->getPost('status');
+        $data = [
+            'id_ujian' => $id,
+            'status' => $status
+        ];
+        $this->ujian->save($data);
+
+        return $this->response->setJSON(['success' => true]);
+    }
+
 }

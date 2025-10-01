@@ -328,6 +328,7 @@
                                 }
                             });
                         }
+                        alert("GALAT : " + res.msg);
                         console.log(res);
                     }
                 }, "json"); // pastikan response dibaca sebagai JSON

@@ -15,6 +15,8 @@ class M_ujian extends Model
         'id_judul',
         'tgl',
         'status',
+        'token',
+        'expired_at',
         'created_at',
         'updated_at'
     ];
@@ -28,6 +30,25 @@ class M_ujian extends Model
         return $this->findAll();
     }
 
+    function get_list_hasil()
+    {
+        $this->select('tbl_ujian.id_ujian,tbl_ujian.tgl,tbl_ujian.status,tbl_judul.id_judul,tbl_judul.judul,tbl_mapel.id_mapel,tbl_mapel.mapel');
+        $this->join('tbl_mapel', 'tbl_ujian.id_mapel = tbl_mapel.id_mapel');
+        $this->join('tbl_judul', 'tbl_ujian.id_judul = tbl_judul.id_judul');
+        $this->where('tbl_ujian.status', 'finish');
+        $this->orderBy('tbl_ujian.updated_at', 'DESC');
+        return $this->findAll();
+    }
+
+    function get_list_where($where)
+    {
+        $this->select('tbl_ujian.id_ujian,tbl_ujian.tgl,tbl_ujian.status,tbl_ujian.token,tbl_ujian.expired_at,tbl_judul.id_judul,tbl_judul.judul,tbl_mapel.id_mapel,tbl_mapel.mapel');
+        $this->join('tbl_mapel', 'tbl_ujian.id_mapel = tbl_mapel.id_mapel');
+        $this->join('tbl_judul', 'tbl_ujian.id_judul = tbl_judul.id_judul');
+        $this->where($where);
+        $this->orderBy('tbl_ujian.updated_at', 'DESC');
+        return $this->findAll();
+    }
     function get_ujian($id)
     {
         $this->select('tbl_ujian.tgl,tbl_judul.judul,tbl_mapel.mapel');

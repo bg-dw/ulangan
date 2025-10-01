@@ -42,6 +42,7 @@ $routes->get('/' . bin2hex('home'), 'Home::index');
 $routes->post('/' . bin2hex('siswa') . '/' . bin2hex('add'), 'Home::ac_add');
 $routes->post('/' . bin2hex('siswa') . '/' . bin2hex('update'), 'Home::ac_update');
 $routes->post('/' . bin2hex('siswa') . '/' . bin2hex('delete'), 'Home::ac_delete');
+$routes->post('/' . bin2hex('siswa') . '/' . bin2hex('update-status'), 'Home::updateStatus');
 
 //JUDUL
 $routes->get('/' . bin2hex('data-judul'), 'Judul::index');
@@ -60,6 +61,7 @@ $routes->get('/' . bin2hex('data-ujian'), 'Ujian::index');
 $routes->post('/' . bin2hex('data-ujian') . '/' . bin2hex('add'), 'Ujian::ac_add');
 $routes->post('/' . bin2hex('data-ujian') . '/' . bin2hex('update'), 'Ujian::ac_update');
 $routes->post('/' . bin2hex('data-ujian') . '/' . bin2hex('delete'), 'Ujian::ac_delete');
+$routes->post('/' . bin2hex('data-ujian') . '/' . bin2hex('update-status'), 'Ujian::updateStatus');
 
 //SOAL
 $routes->get('/' . bin2hex('data-soal'), 'Soal::index');
@@ -74,9 +76,14 @@ $routes->post('/' . bin2hex('data-draft') . '/' . bin2hex('update'), 'Soal::upda
 $routes->post('/' . bin2hex('data-draft') . '/' . bin2hex('final'), 'Soal::finalDraft');
 $routes->post('/' . bin2hex('data-draft') . '/' . bin2hex('delete'), 'Soal::ac_delete');
 
-$routes->get('/' . bin2hex('daftar-login'), 'ulangan::index');
-$routes->get('/' . bin2hex('reset-login'), 'ulangan::reset');
-$routes->get('/' . bin2hex('status-tes'), 'ulangan::status');
+
+//ULANGAN
+$routes->get('/' . bin2hex('daftar-login'), 'Ulangan::index');
+$routes->get('/' . bin2hex('reset-login'), 'Ulangan::reset');
+$routes->get('/' . bin2hex('status-tes'), 'Ulangan::status');
+$routes->post('/' . bin2hex('data-ulangan') . '/' . bin2hex('rilis-token'), 'Ulangan::rilisToken');
+$routes->post('/' . bin2hex('data-ulangan') . '/' . bin2hex('hapus-token'), 'Ulangan::hapusToken');
+
 $routes->get('/' . bin2hex('hasil-ulangan'), 'Hasil::index');
 
 /*
