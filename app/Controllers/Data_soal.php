@@ -2,22 +2,25 @@
 
 namespace App\Controllers;
 use App\Models\M_soal;
+use App\Models\M_judul;
+use App\Models\M_mapel;
 use App\Models\M_ujian;
 
-class Soal extends BaseController
+class Data_soal extends BaseController
 {
-    protected $soal, $ujian;
+    protected $soal, $judul, $mapel, $ujian;
 
     public function __construct()
     {
-        $this->is_session_available();
         $this->soal = new M_soal();
+        $this->judul = new M_judul();
+        $this->mapel = new M_mapel();
         $this->ujian = new M_ujian();
     }
 
     public function index()
     {
-        $userId = session()->get('id'); // konsisten pakai id_user
+        $userId = session()->get('id'); // konsisten pakai id user
 
         $soals = $this->soal->get_list($userId);
         return view('soal/V_soal', ['soals' => $soals]);
@@ -26,7 +29,8 @@ class Soal extends BaseController
     function add_soal()
     {
         $data['title'] = 'Buat Soal';
-        $data['ujian'] = $this->ujian->get_list();
+        $data['judul'] = $this->judul->findAll();
+        $data['mapel'] = $this->mapel->findAll();
         return view('soal/V_soal_add', $data);
     }
 
@@ -36,15 +40,16 @@ class Soal extends BaseController
 
         $errors = [];
 
-        if (empty($data['id-ujian'])) {
-            $errors['id-ujian'] = 'ujian harus dipilih';
+        if (empty($data['id-judul']) || empty($data['id-mapel'])) {
+            $errors['id-judul'] = 'Judul harus dipilih';
+            $errors['id-mapel'] = 'Mapel harus dipilih';
         }
 
-        $cek = $this->soal->where('id_ujian', $data['id-ujian'])->first();
+        $cek = $this->soal->where(['id_judul' => $data['id-judul'], 'id_mapel' => $data['id-mapel']])->first();
         if ($cek) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'msg' => 'Data Ujian sudah pernah dibuat! '
+                'msg' => 'Soal sudah pernah dibuat! '
             ]);
         }
 
@@ -90,11 +95,11 @@ class Soal extends BaseController
             ]);
         }
 
-        $id_ujian = $this->request->getPost('id-ujian');
         //simpan ke database
         $this->soal->save([
             'id_guru' => session()->get('id'),
-            'id_ujian' => $id_ujian,
+            'id_judul' => $data['id-judul'],
+            'id_mapel' => $data['id-mapel'],
             'data' => json_encode($this->request->getPost()),
             'status' => 'final',
             'updated_at' => date('Y-m-d H:i:s')
@@ -113,8 +118,9 @@ class Soal extends BaseController
     public function saveDraft()
     {
         $userId = session()->get('id');
-        $idujian = $this->request->getPost('id-ujian');
-        $cek = $this->soal->where('id_ujian', $idujian)->first();
+        $id_judul = $this->request->getPost('id-judul');
+        $id_mapel = $this->request->getPost('id-mapel');
+        $cek = $this->soal->where(['id_judul' => $id_judul, 'id_mapel' => $id_mapel])->first();
         if ($cek) {
             return $this->response->setJSON([
                 'status' => 'error',
@@ -123,7 +129,8 @@ class Soal extends BaseController
         }
         $this->soal->save([
             'id_guru' => $userId,
-            'id_ujian' => $idujian,
+            'id_judul' => $id_judul,
+            'id_mapel' => $id_mapel,
             'data' => json_encode($this->request->getPost()),
             'status' => 'draft',
             'updated_at' => date('Y-m-d H:i:s')
@@ -131,18 +138,17 @@ class Soal extends BaseController
 
         return $this->response->setJSON(['status' => 'ok']);
     }
-
     public function editDraft($idDraft)
     {
+        $judul = $this->judul->findAll();
+        $mapel = $this->mapel->findAll();
         $draft = $this->soal->find($idDraft);
         if (!$draft) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Draft tidak ditemukan");
         }
 
         $draft['data'] = json_decode($draft['data'], true);
-        $id_ujian = $draft['id_ujian'];
-        $draft['ujian'] = $this->ujian->get_ujian($id_ujian);
-        return view('soal/V_soal_edit', ['draft' => $draft]);
+        return view('soal/V_soal_edit', ['draft' => $draft, 'judul' => $judul, 'mapel' => $mapel]);
     }
 
     public function updateDraft()
@@ -179,11 +185,17 @@ class Soal extends BaseController
     //delete draft
     public function ac_delete()
     {
-        $send = $this->soal->where('id_soal', $this->request->getVar('id'))->delete();
-        if ($send):
-            session()->setFlashdata('success', ' Data berhasil dihapus.');
+        $id = $this->request->getVar('id');
+        $cek = $this->ujian->where('id_soal', $id)->first();
+        if ($cek):
+            session()->setFlashdata('error', ' Record digunakan oleh Data Ujian!');
         else:
-            session()->setFlashdata('warning', ' Data gagal dihapus.');
+            $send = $this->soal->where('id_soal', $id)->delete();
+            if ($send):
+                session()->setFlashdata('success', ' Data berhasil dihapus.');
+            else:
+                session()->setFlashdata('warning', ' Data gagal dihapus.');
+            endif;
         endif;
         return redirect()->route(bin2hex('data-soal'));
     }

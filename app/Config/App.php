@@ -108,7 +108,7 @@ class App extends BaseConfig
 	 *
 	 * @var string
 	 */
-	public $appTimezone = 'America/Chicago';
+	public $appTimezone = 'Asia/Jakarta';
 
 	/**
 	 * --------------------------------------------------------------------------
@@ -174,7 +174,7 @@ class App extends BaseConfig
 	 *
 	 * @var integer
 	 */
-	public $sessionExpiration = 7200;
+	public $sessionExpiration = 0;
 
 	/**
 	 * --------------------------------------------------------------------------

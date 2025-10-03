@@ -103,12 +103,8 @@
                 enctype="multipart/form-data">
                 <div class="modal-body">
                     <input type="hidden" name="id" class="form-control" required id="d-id">
-                    <div class="form-group">
-                        <label>Judul</label>
-                        <input type="text" name="judul" class="form-control" disabled id="d-judul">
-                    </div><br>
                     <center>
-                        <h4>Seluruh data yang berkaitan dengan judul diatas akan terhapus. Hapus data?</h4>
+                        <h4>Hapus data terpilih?</h4>
                     </center>
                 </div>
                 <div class="modal-footer bg-whitesmoke br">

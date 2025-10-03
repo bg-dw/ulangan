@@ -4,12 +4,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h4>Hasil Ulangan</h4>
-                <div class="card-header-action" role="group" aria-label="Basic example" id="group-btn">
-                    <button type="button" class="btn btn-primary" id="btn-add">
-                        <i class="fas fa-plus"></i> Tambah
-                    </button>
-                </div>
+                <h4>Rekap Data</h4>
             </div>
             <div class="card-body" id="tbl-data">
                 <div class="table-responsive">

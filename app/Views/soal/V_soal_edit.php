@@ -1,5 +1,8 @@
 <?= $this->extend('Main') ?>
 <?= $this->section('content') ?>
+<?php
+// dd($draft['data']); 
+?>
 <div class="row">
     <div class="col-12">
         <div class="card card-primary">
@@ -10,15 +13,30 @@
                 <form id="draftForm" action="<?= base_url('/' . bin2hex('data-draft') . '/' . bin2hex('update')) ?>"
                     method="post">
                     <input type="hidden" name="id-soal" value="<?= esc($draft['id_soal']) ?>" required>
-                    <input type="hidden" name="id-ujian" value="<?= esc($draft['id_ujian']) ?>" required>
                     <input type="hidden" name="status" id="formStatus" value="draft">
                     <div class="form-row">
-                        <div class="form-group col-md-12">
-                            <label>Ujian</label>
-                            <select class="form-control" disabled>
-                                <option>
-                                    <?= $draft['ujian']['judul'] . " - " . $draft['ujian']['mapel'] . " [ " . $draft['ujian']['tgl'] . " ]" ?>
-                                </option>
+                        <div class="form-group col-md-6">
+                            <label for="sel-judul">Judul</label>
+                            <select class="form-control" name="id-judul" id="sel-judul" required>
+                                <?php foreach ($judul as $row): ?>
+                                    <option value="<?= $row['id_judul'] ?>" <?php if ($draft['id_judul'] == $row['id_judul']) {
+                                          echo "selected";
+                                      } ?>>
+                                        <?= $row['judul'] ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="sel-mapel">Mapel</label>
+                            <select class="form-control" name="id-mapel" id="sel-mapel" required>
+                                <?php foreach ($mapel as $row): ?>
+                                    <option value="<?= $row['id_mapel'] ?>" <?php if ($draft['id_mapel'] == $row['id_mapel']) {
+                                          echo "selected";
+                                      } ?>>
+                                        <?= $row['mapel'] ?>
+                                    </option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
                     </div>
@@ -85,28 +103,35 @@
         return [x];
     }
 
+    /** MAIN: generate fields di #generatedFields */
     /** escape helpers */
     function escapeHtml(s) {
         if (s == null) return '';
-        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return String(s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
     }
     function escapeAttr(s) {
         if (s == null) return '';
-        return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return String(s)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
     }
 
-    /** builder untuk nested opsi/kunci menjadi array-of-arrays */
-    function buildNestedGroups(raw) {
-        if (!raw) return [];
-        if (Array.isArray(raw)) {
-            return raw.map(item => toArrayMaybe(item));
+    /** Normalisasi supaya object { "1":"...", "2":"..." } jadi array ["...","..."] */
+    function normalizeIndexedObject(obj) {
+        if (Array.isArray(obj)) return obj;
+        if (obj && typeof obj === 'object') {
+            const keys = Object.keys(obj).sort((a, b) => Number(a) - Number(b));
+            return keys.map(k => obj[k]);
         }
-        if (typeof raw === 'object') {
-            const keys = Object.keys(raw).sort((a, b) => Number(a) - Number(b));
-            return keys.map(k => toArrayMaybe(raw[k]));
-        }
-        return [];
+        return obj ? [obj] : [];
     }
+
 
     /** MAIN: generate fields di #generatedFields */
     function generateSoalFieldFromDraft(data) {
@@ -114,18 +139,18 @@
         container.innerHTML = '';
         if (!data) return;
 
-        const jenisArr = data.jenis_soal || [];
-        const jumlahArr = data.jumlah_soal || [];
-        const pertGroups = data.pertanyaan || [];
-        const opsiGroups = data.opsi || [];
-        const kunciGroups = data.kunci || [];
+        const jenisArr = normalizeIndexedObject(data.jenis_soal) || [];
+        const jumlahArr = normalizeIndexedObject(data.jumlah_soal) || [];
+        const pertGroups = normalizeIndexedObject(data.pertanyaan) || [];
+        const opsiGroups = normalizeIndexedObject(data.opsi) || [];
+        const kunciGroups = normalizeIndexedObject(data.kunci) || [];
 
         let soalCounter = 1;
 
         jenisArr.forEach((jenis, groupIndex) => {
-            const savedQuestions = pertGroups[groupIndex] || [];
-            const opsiForGroup = opsiGroups[groupIndex] || [];
-            const kForGroup = kunciGroups[groupIndex] || [];
+            const savedQuestions = normalizeIndexedObject(pertGroups[groupIndex]) || [];
+            const opsiForGroup = normalizeIndexedObject(opsiGroups[groupIndex]) || [];
+            const kForGroup = normalizeIndexedObject(kunciGroups[groupIndex]) || [];
 
             let count = savedQuestions.length || parseInt(jumlahArr[groupIndex]) || 0;
             if (count <= 0) return;
@@ -136,18 +161,17 @@
                 wrapper.className = 'mb-3 p-3 border rounded';
 
                 wrapper.innerHTML = `
-                <label class="fw-bold"><strong>Soal ${soalCounter} (${jenis.replace("_", " ")})</strong></label>
+                <label class="fw-bold">Soal ${soalCounter} (${jenis.replace("_", " ")})</label>
                 <textarea class="form-control mb-2" name="pertanyaan[${groupIndex}][]">${escapeHtml(qText)}</textarea>
             `;
 
                 if (jenis === 'pilihan_ganda') {
-                    const opsiForSoal = opsiForGroup[si] || [];
-
-                    ['a', 'b', 'c', 'd'].forEach((letter, oi) => {
-                        const val = opsiForSoal[oi] || '';
+                    const opsiForSoal = normalizeIndexedObject(opsiForGroup[si]) || [];
+                    ['a', 'b', 'c', 'd'].forEach(letter => {
+                        const val = opsiForSoal[letter] || opsiForSoal[letter === 'a' ? 0 : letter === 'b' ? 1 : letter === 'c' ? 2 : 3] || '';
                         wrapper.innerHTML += `
                         <div class="input-group mb-1">
-                            <span class="input-group-text text-uppercase"><strong>${letter}.</strong></span>
+                            <span class="input-group-text text-uppercase">${letter}.</span>
                             <input type="text" class="form-control"
                                 name="opsi[${groupIndex}][${si}][]"
                                 placeholder="Pilihan ${letter.toUpperCase()}"
@@ -158,8 +182,8 @@
 
                     const savedKunci = kForGroup[si] || '';
                     wrapper.innerHTML += `
-                    <label class="mt-2"><strong>Kunci Jawaban</strong></label>
-                    <select class="form-control mb-1 col-md-1" name="kunci[${groupIndex}][]">
+                    <label class="mt-2">Kunci Jawaban</label>
+                    <select class="form-control mb-1" name="kunci[${groupIndex}][]">
                         ${['a', 'b', 'c', 'd'].map(opt => `
                             <option value="${opt}" ${savedKunci === opt ? 'selected' : ''}>${opt.toUpperCase()}</option>
                         `).join('')}
@@ -169,12 +193,12 @@
                     const savedKunci = kForGroup[si] || '';
                     if (jenis === 'uraian') {
                         wrapper.innerHTML += `
-                        <label class="mt-2"><strong>Panduan / Kunci Jawaban</strong></label>
+                        <label class="mt-2">Panduan / Kunci Jawaban</label>
                         <textarea class="form-control" name="kunci[${groupIndex}][]">${escapeHtml(savedKunci)}</textarea>
                     `;
                     } else {
                         wrapper.innerHTML += `
-                        <label class="mt-2"><strong>Kunci Jawaban</strong></label>
+                        <label class="mt-2">Kunci Jawaban</label>
                         <input type="text" class="form-control" name="kunci[${groupIndex}][]" value="${escapeAttr(savedKunci)}">
                     `;
                     }
@@ -185,7 +209,6 @@
             }
         });
     }
-
 
     /** run on DOM ready */
     document.addEventListener('DOMContentLoaded', function () {
@@ -214,20 +237,27 @@
         }
 
         // tombol simpan final
-        document.getElementById("btnFinal").addEventListener("click", function () {
-            if (!validateForm()) {
-                alert("Masih ada field yang kosong. Harap lengkapi semua isian sebelum finalisasi.");
-                return;
-            }
-            form.action = "<?= base_url('/' . bin2hex('data-draft') . '/' . bin2hex('final')) ?>";
-            statusInput.value = "final";
-            form.submit();
-        });
+        const btnFinal = document.getElementById("btnFinal");
+        const btnUpdate = document.getElementById("btnUpdate");
+
+        if (btnFinal) {
+            btnFinal.addEventListener("click", function () {
+                if (!validateForm()) {
+                    alert("Masih ada field yang kosong. Harap lengkapi semua isian sebelum finalisasi.");
+                    return;
+                }
+                form.action = "<?= base_url('/' . bin2hex('data-draft') . '/' . bin2hex('final')) ?>";
+                statusInput.value = "final";
+                form.submit();
+            });
+        }
 
         // tombol update draft → biarkan default
-        document.getElementById("btnUpdate").addEventListener("click", function () {
-            statusInput.value = "draft";
-        });
+        if (btnUpdate) {
+            btnUpdate.addEventListener("click", function () {
+                statusInput.value = "draft";
+            });
+        }
     });
 
 </script>

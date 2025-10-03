@@ -2,48 +2,40 @@
 
 namespace App\Controllers;
 use App\Models\M_ujian;
-use App\Models\M_mapel;
-use App\Models\M_judul;
+use App\Models\M_ujian_detail;
+use App\Models\M_soal;
 
-class Ujian extends BaseController
+class Data_ujian extends BaseController
 {
-    protected $ujian, $mapel, $judul;
+    protected $ujian, $soal, $detail;
     public function __construct()
     {
-        $this->is_session_available();
         $this->ujian = new M_ujian();
-        $this->mapel = new M_mapel();
-        $this->judul = new M_judul();
+        $this->detail = new M_ujian_detail();
+        $this->soal = new M_soal();
     }
 
     public function index()
     {
-        $data['title'] = 'Ulangan';
-        $data['mapel'] = $this->mapel->findAll();
-        $data['judul'] = $this->judul->findAll();
+        $userId = session()->get('id');
+        $data['title'] = 'Data Ujian';
+        $data['soal'] = $this->soal->soal_ready($userId);
         $data['ujian'] = $this->ujian->get_list();
-        return view('V_ujian', $data);
+        return view('V_data_ujian', $data);
     }
 
     //tambah ujian
     public function ac_add()
     {
-        $id_judul = $this->request->getVar('id-judul');
-        $id_mapel = $this->request->getVar('id-mapel');
+        $id_soal = $this->request->getVar('id-soal');
         $tgl = $this->request->getVar('tgl');
-        $where = [
-            'id_judul' => $id_judul,
-            'id_mapel' => $id_mapel,
+        $data = [
+            'id_soal' => $id_soal,
             'tgl' => $tgl
         ];
-        $cek = $this->ujian->where($where)->first();
+        $cek = $this->ujian->where($data)->first();
         if (!$cek):
-            if ($id_judul):
-                $data = [
-                    'id_judul' => $id_judul,
-                    'id_mapel' => $id_mapel,
-                    'tgl' => $tgl
-                ];
+            if ($id_soal):
                 $send = $this->ujian->save($data);
                 if ($send) {
                     session()->setFlashdata('success', ' Data berhasil disimpan.');
@@ -61,21 +53,15 @@ class Ujian extends BaseController
     public function ac_update()
     {
         $id_ujian = $this->request->getVar('id');
-        $id_judul = $this->request->getVar('id-judul');
-        $id_mapel = $this->request->getVar('id-mapel');
+        $id_soal = $this->request->getVar('id-soal');
         $tgl = $this->request->getVar('tgl');
-        $where = [
-            'id_judul' => $id_judul,
-            'id_mapel' => $id_mapel,
-            'tgl' => $tgl
-        ];
+        $where = "id_ujian !=" . $id_ujian . " AND id_soal=" . $id_soal . " AND tgl='" . $tgl . "'";
         $cek = $this->ujian->where($where)->first();
         if (!$cek):
             if ($id_ujian):
                 $data = [
                     'id_ujian' => $id_ujian,
-                    'id_judul' => $id_judul,
-                    'id_mapel' => $id_mapel,
+                    'id_soal' => $id_soal,
                     'tgl' => $tgl
                 ];
                 $send = $this->ujian->save($data);
@@ -94,26 +80,20 @@ class Ujian extends BaseController
     //delete siswa
     public function ac_delete()
     {
-        $send = $this->ujian->where('id_ujian', $this->request->getVar('id'))->delete();
-        if ($send):
-            session()->setFlashdata('success', ' Data berhasil dihapus.');
+
+        $id = $this->request->getVar('id');
+        $cek = $this->detail->where('id_ujian', $id)->first();
+        if ($cek):
+            session()->setFlashdata('error', ' Record digunakan oleh Data Soal!');
         else:
-            session()->setFlashdata('warning', ' Data gagal dihapus.');
+            $send = $this->ujian->where('id_ujian', $id)->delete();
+            if ($send):
+                session()->setFlashdata('success', ' Data berhasil dihapus.');
+            else:
+                session()->setFlashdata('warning', ' Data gagal dihapus.');
+            endif;
         endif;
         return redirect()->route(bin2hex('data-ujian'));
-    }
-
-    public function updateStatus()
-    {
-        $id = $this->request->getPost('id');
-        $status = $this->request->getPost('status');
-        $data = [
-            'id_ujian' => $id,
-            'status' => $status
-        ];
-        $this->ujian->save($data);
-
-        return $this->response->setJSON(['success' => true]);
     }
 
 }

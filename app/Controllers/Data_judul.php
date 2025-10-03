@@ -2,14 +2,15 @@
 
 namespace App\Controllers;
 use App\Models\M_judul;
+use App\Models\M_ujian;
 
-class Judul extends BaseController
+class Data_judul extends BaseController
 {
-    protected $judul;
+    protected $judul, $ujian;
     public function __construct()
     {
-        $this->is_session_available();
         $this->judul = new M_judul();
+        $this->ujian = new M_ujian();
     }
 
     public function index()
@@ -65,11 +66,17 @@ class Judul extends BaseController
     //delete judul
     public function ac_delete()
     {
-        $send = $this->judul->where('id_judul', $this->request->getVar('id'))->delete();
-        if ($send):
-            session()->setFlashdata('success', ' Data berhasil dihapus.');
+        $id = $this->request->getVar('id');
+        $cek = $this->ujian->where('id_judul', $id)->first();
+        if ($cek):
+            session()->setFlashdata('error', ' Record digunakan oleh Data Ujian!');
         else:
-            session()->setFlashdata('warning', ' Data gagal dihapus.');
+            $send = $this->judul->where('id_judul', $id)->delete();
+            if ($send):
+                session()->setFlashdata('success', ' Data berhasil dihapus.');
+            else:
+                session()->setFlashdata('warning', ' Data gagal dihapus.');
+            endif;
         endif;
         return redirect()->route(bin2hex('data-judul'));
     }

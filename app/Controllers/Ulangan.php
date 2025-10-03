@@ -8,7 +8,6 @@ class Ulangan extends BaseController
     protected $ujian;
     public function __construct()
     {
-        $this->is_session_available();
         $this->ujian = new M_ujian();
     }
 
@@ -26,7 +25,7 @@ class Ulangan extends BaseController
     public function status()
     {
         $data['title'] = 'Status Ujian';
-        $where = "tbl_ujian.status='final' OR tbl_ujian.status='dikerjakan'";
+        $where = "tbl_ujian_detail.status='final' OR tbl_ujian_detail.status='dikerjakan'";
         $data['ujian'] = $this->ujian->get_list_where($where);
         return view('V_ulangan_status', $data);
     }

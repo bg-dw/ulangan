@@ -6,12 +6,22 @@
             <div class="card-body">
                 <form action="<?= base_url('/' . bin2hex('soal') . '/' . bin2hex('add')) ?>" method="post">
                     <div class="form-row">
-                        <div class="form-group col-md-12">
-                            <label for="sel-ujian">Ujian</label>
-                            <select class="form-control" name="id-ujian" id="sel-ujian" required>
-                                <?php foreach ($ujian as $row): ?>
-                                    <option value="<?= $row['id_ujian'] ?>">
-                                        <?= $row['judul'] . " - " . $row['mapel'] . " [ " . $row['tgl'] . " ]" ?>
+                        <div class="form-group col-md-6">
+                            <label for="sel-judul">Judul</label>
+                            <select class="form-control" name="id-judul" id="sel-judul" required>
+                                <?php foreach ($judul as $row): ?>
+                                    <option value="<?= $row['id_judul'] ?>">
+                                        <?= $row['judul'] ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="sel-mapel">Mapel</label>
+                            <select class="form-control" name="id-mapel" id="sel-mapel" required>
+                                <?php foreach ($mapel as $row): ?>
+                                    <option value="<?= $row['id_mapel'] ?>">
+                                        <?= $row['mapel'] ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -249,8 +259,8 @@
 
             // field inti
             const requiredFields = [
-                { selector: "input[name='judul']", message: "Judul harus diisi" },
-                { selector: "select[name='id-ujian']", message: "ujian harus dipilih" },
+                { selector: "select[name='id-judul']", message: "Judul harus diisi" },
+                { selector: "select[name='id-mapel']", message: "Mapel harus dipilih" },
                 { selector: "select.jenis-soal", message: "Jenis soal harus dipilih" },
                 { selector: "input.jumlah-soal", message: "Jumlah soal harus diisi" },
                 { selector: "input.bobot", message: "Bobot harus diisi" }

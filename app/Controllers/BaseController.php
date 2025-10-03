@@ -28,14 +28,6 @@ class BaseController extends Controller
 	 * @var array
 	 */
 	protected $helpers = ['url'];
-	public function is_session_available()
-	{
-		if (session()->get('passed') != true):
-			session()->setFlashdata('warning', 'Silahkan Login!');
-			header('Location: ' . base_url(route_to('/' . bin2hex('login'))));
-			exit();
-		endif;
-	}
 	/**
 	 * Constructor.
 	 *

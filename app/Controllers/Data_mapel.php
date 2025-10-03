@@ -2,14 +2,15 @@
 
 namespace App\Controllers;
 use App\Models\M_mapel;
+use App\Models\M_ujian;
 
-class Mapel extends BaseController
+class Data_mapel extends BaseController
 {
-    protected $mapel;
+    protected $mapel, $ujian;
     public function __construct()
     {
-        $this->is_session_available();
         $this->mapel = new M_mapel();
+        $this->ujian = new M_ujian();
     }
 
     public function index()
@@ -58,11 +59,17 @@ class Mapel extends BaseController
     //delete mapel
     public function ac_delete()
     {
-        $send = $this->mapel->where('id_mapel', $this->request->getVar('id'))->delete();
-        if ($send):
-            session()->setFlashdata('success', ' Data berhasil dihapus.');
+        $id = $this->request->getVar('id');
+        $cek = $this->ujian->where('id_mapel', $id)->first();
+        if ($cek):
+            session()->setFlashdata('error', ' Record digunakan oleh Data Ujian!');
         else:
-            session()->setFlashdata('warning', ' Data gagal dihapus.');
+            $send = $this->mapel->where('id_mapel', $id)->delete();
+            if ($send):
+                session()->setFlashdata('success', ' Data berhasil dihapus.');
+            else:
+                session()->setFlashdata('warning', ' Data gagal dihapus.');
+            endif;
         endif;
         return redirect()->route(bin2hex('data-mapel'));
     }

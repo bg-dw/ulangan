@@ -12,7 +12,8 @@ class M_soal extends Model
     protected $allowedFields = [
         'id_soal',
         'id_guru',
-        'id_ujian',
+        'id_judul',
+        'id_mapel',
         'data',
         'status',
         'created_at',
@@ -21,11 +22,21 @@ class M_soal extends Model
 
     function get_list($id)
     {
-        $this->select('tbl_soal.id_soal,tbl_soal.status,tbl_soal.created_at,tbl_soal.updated_at,tbl_ujian.tgl,tbl_judul.judul,tbl_mapel.mapel');
-        $this->join('tbl_ujian', 'tbl_soal.id_ujian = tbl_ujian.id_ujian');
-        $this->join('tbl_mapel', 'tbl_ujian.id_mapel = tbl_mapel.id_mapel');
-        $this->join('tbl_judul', 'tbl_ujian.id_judul = tbl_judul.id_judul');
+        $this->select('tbl_soal.id_soal,tbl_soal.status,tbl_soal.created_at,tbl_soal.updated_at,tbl_judul.judul,tbl_mapel.mapel');
+        $this->join('tbl_mapel', 'tbl_soal.id_mapel = tbl_mapel.id_mapel');
+        $this->join('tbl_judul', 'tbl_soal.id_judul = tbl_judul.id_judul');
         $this->where(['tbl_soal.id_guru' => $id]);
+        $this->orderBy('tbl_soal.updated_at', 'DESC');
+        return $this->findAll();
+    }
+
+    function soal_ready($id)
+    {
+        $this->select('tbl_soal.id_soal,tbl_soal.status,tbl_soal.created_at,tbl_soal.updated_at,tbl_judul.judul,tbl_mapel.mapel');
+        $this->join('tbl_mapel', 'tbl_soal.id_mapel = tbl_mapel.id_mapel');
+        $this->join('tbl_judul', 'tbl_soal.id_judul = tbl_judul.id_judul');
+        $this->where(['tbl_soal.id_guru' => $id]);
+        $this->where(['tbl_soal.status' => 'final']);
         $this->orderBy('tbl_soal.updated_at', 'DESC');
         return $this->findAll();
     }

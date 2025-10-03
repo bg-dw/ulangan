@@ -22,7 +22,6 @@
                                 <th class="text-center">Aksi</th>
                                 <th class="text-center">Judul</th>
                                 <th class="text-center">Mata Pelajaran</th>
-                                <th class="text-center">Status</th>
                                 <th class="text-center">Tanggal</th>
                             </tr>
                         </thead>
@@ -36,18 +35,14 @@
                                             <?= $i++ . "."; ?>
                                         </td>
                                         <td class="text-center aksi-col-<?= $row['id_ujian'] ?>" style="width: 13%">
-                                            <?php if ($row['status'] == 'draft' || $row['status'] == 'final'): ?>
-                                                <button class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit ujian"
-                                                    onclick="update_ujian('<?= $row['id_ujian'] ?>','<?= $row['id_judul'] ?>','<?= $row['id_mapel'] ?>','<?= $row['tgl'] ?>')">
-                                                    <i class="fas fa-pen"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-danger" data-toggle="tooltip" title="Hapus ujian"
-                                                    onclick="hapus('<?= $row['id_ujian'] ?>')">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            <?php else: ?>
-                                                <span class="badge badge-info">Tidak bisa diubah</span>
-                                            <?php endif; ?>
+                                            <button class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit ujian"
+                                                onclick="update_ujian('<?= $row['id_ujian'] ?>','<?= $row['id_soal'] ?>','<?= $row['tgl'] ?>')">
+                                                <i class="fas fa-pen"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" data-toggle="tooltip" title="Hapus ujian"
+                                                onclick="hapus('<?= $row['id_ujian'] ?>')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
                                         </td>
 
                                         <td>
@@ -56,21 +51,7 @@
                                         <td><span class="badge badge-primary"><?= $row['mapel'] ?></span>
                                         </td>
                                         <td class="text-center">
-                                            <select class="form-control form-control-sm status-select"
-                                                data-id="<?= $row['id_ujian'] ?>">
-                                                <option value="draft" <?= $row['status'] == 'draft' ? 'selected' : '' ?>>Draft
-                                                </option>
-                                                <option value="final" <?= $row['status'] == 'final' ? 'selected' : '' ?>>Final
-                                                </option>
-                                                <option value="dikerjakan" <?= $row['status'] == 'dikerjakan' ? 'selected' : '' ?>>
-                                                    Dikerjakan</option>
-                                                <option value="selesai" <?= $row['status'] == 'selesai' ? 'selected' : '' ?>>
-                                                    Selesai</option>
-                                            </select>
-                                        </td>
-
-                                        <td class="text-center">
-                                            <?= $row['tgl'] ?>
+                                            <?= date('d F Y', strtotime($row['tgl'])) ?>
                                         </td>
                                     </tr>
                                     <?php
@@ -84,25 +65,17 @@
                 <form action="<?= base_url('/' . bin2hex('data-ujian') . '/' . bin2hex('add')) ?>" method="post"
                     onsubmit="return confirm('Simpan Data?')">
                     <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="sel-judul">Judul</label>
-                            <select class="form-control" name="id-judul" id="sel-judul" required>
-                                <?php foreach ($judul as $row): ?>
-                                    <option value="<?= $row['id_judul'] ?>"><?= $row['judul'] ?></option>
+                        <div class="form-group col-md-9">
+                            <label for="i-sel-soal">Soal</label>
+                            <select class="form-control" name="id-soal" id="i-sel-soal" required>
+                                <?php foreach ($soal as $row): ?>
+                                    <option value="<?= $row['id_soal'] ?>">
+                                        <?= $row['judul'] . " - " . $row['mapel'] ?>
+                                    </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="sel-mapel">Mapel</label>
-                            <select class="form-control" name="id-mapel" id="sel-mapel" required>
-                                <?php foreach ($mapel as $row): ?>
-                                    <option value="<?= $row['id_mapel'] ?>"><?= $row['mapel'] ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-3">
                             <label for="inp-tgl">Tanggal Ujian</label>
                             <input class="form-control" type="date" name="tgl" id="inp-tgl" required>
                         </div>
@@ -118,25 +91,16 @@
                     onsubmit="return confirm('Simpan Data?')">
                     <input type="hidden" name="id" id="u-inp-id" required>
                     <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="u-sel-judul">Judul</label>
-                            <select class="form-control" name="id-judul" id="u-sel-judul" required>
-                                <?php foreach ($judul as $row): ?>
-                                    <option value="<?= $row['id_judul'] ?>"><?= $row['judul'] ?></option>
+                        <div class="form-group col-md-9">
+                            <label for="u-sel-soal">Soal</label>
+                            <select class="form-control" name="id-soal" id="u-sel-soal" required>
+                                <?php foreach ($soal as $row): ?>
+                                    <option value="<?= $row['id_soal'] ?>"><?= $row['judul'] . " - " . $row['mapel'] ?>
+                                    </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="u-sel-mapel">Mapel</label>
-                            <select class="form-control" name="id-mapel" id="u-sel-mapel" required>
-                                <?php foreach ($mapel as $row): ?>
-                                    <option value="<?= $row['id_mapel'] ?>"><?= $row['mapel'] ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-3">
                             <label for="u-inp-tgl">Tanggal Ujian</label>
                             <input class="form-control" type="date" name="tgl" id="u-inp-tgl" required>
                         </div>
@@ -186,54 +150,6 @@
                 emptyTable: "Tidak ada data tersedia"
             }
         });
-
-        $(document).on("change", ".status-select", function () {
-            let select = $(this);
-            let idUjian = select.data("id");
-            let statusBaru = select.val();
-            let statusLama = select.find("option[selected]").val();
-
-            if (confirm("Apakah Anda yakin ingin mengubah status menjadi " + statusBaru.toUpperCase() + " ?")) {
-                $.ajax({
-                    url: "<?= base_url('/' . bin2hex('data-ujian') . '/' . bin2hex('update-status')) ?>",
-                    type: "POST",
-                    data: { id: idUjian, status: statusBaru },
-                    success: function (res) {
-                        alert("Status berhasil diperbarui!");
-
-                        // update option[selected]
-                        select.find("option").removeAttr("selected");
-                        select.find("option[value='" + statusBaru + "']").attr("selected", true);
-
-                        // === manipulasi tombol edit/hapus ===
-                        let aksiCol = $(".aksi-col-" + idUjian);
-
-                        if (statusBaru === "dikerjakan" || statusBaru === "selesai") {
-                            aksiCol.html('<span class="badge badge-info">Tidak bisa diubah</span>');
-                        } else {
-                            aksiCol.html(`
-                        <button class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit ujian"
-                            onclick="update_ujian('${idUjian}','dummy','dummy','2025-10-01')">
-                            <i class="fas fa-pen"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger" data-toggle="tooltip" title="Hapus ujian"
-                            onclick="hapus('${idUjian}')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    `);
-                        }
-                    },
-                    error: function () {
-                        alert("Gagal update status.");
-                        select.val(statusLama);
-                    }
-                });
-            } else {
-                select.val(statusLama);
-            }
-        });
-
-
     });
 
     $('#btn-add').click(function () {
@@ -247,13 +163,12 @@
         $('#tbl-data').show('slow');
     });
 
-    function update_ujian(id_ujian, id_judul, id_mapel, tgl) {
+    function update_ujian(id_ujian, id_soal, tgl) {
         $('#tbl-data').hide('slow');
         $('#group-btn').hide('slow');
         $('#f-update').show('slow');
         $('#u-inp-id').val(id_ujian);
-        $('#u-sel-judul').val(id_judul);
-        $('#u-sel-mapel').val(id_mapel);
+        $('#u-sel-soal').val(id_soal).change();
         $('#u-inp-tgl').val(tgl);
     }
 

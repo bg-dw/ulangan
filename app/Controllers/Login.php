@@ -28,7 +28,7 @@ class Login extends BaseController
                 'pass' => $cek['password'],
                 'passed' => true,
             ];
-            $this->session->set($ses);
+            session()->set($ses);
             session()->setFlashdata('success', ' Selamat Datang!');
             return redirect()->route(bin2hex('home'));
         else:
@@ -37,7 +37,8 @@ class Login extends BaseController
     }
     public function logout()
     {
-        $this->session->destroy();
-        return redirect()->route(bin2hex('login'));
+        session()->destroy();
+        return redirect()->to(base_url('/' . bin2hex('login')));
     }
+
 }
