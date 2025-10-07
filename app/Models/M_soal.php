@@ -40,4 +40,17 @@ class M_soal extends Model
         $this->orderBy('tbl_soal.updated_at', 'DESC');
         return $this->findAll();
     }
+
+    function soal_dikerjakan($id)
+    {
+        $this->select('tbl_soal.id_soal,tbl_soal.data,tbl_soal.status,tbl_soal.created_at,tbl_soal.updated_at,tbl_judul.judul,tbl_mapel.mapel,tbl_ujian_detail.id_ujian_detail');
+        $this->join('tbl_mapel', 'tbl_soal.id_mapel = tbl_mapel.id_mapel');
+        $this->join('tbl_judul', 'tbl_soal.id_judul = tbl_judul.id_judul');
+        $this->join('tbl_ujian', 'tbl_ujian.id_soal = tbl_soal.id_soal');
+        $this->join('tbl_ujian_detail', 'tbl_ujian_detail.id_ujian = tbl_ujian.id_ujian');
+        $this->where(['tbl_ujian_detail.id_ujian' => $id]);
+        $this->where(['tbl_ujian_detail.status' => 'dikerjakan']);
+        $this->orderBy('tbl_soal.updated_at', 'DESC');
+        return $this->findAll();
+    }
 }

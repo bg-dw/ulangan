@@ -35,14 +35,18 @@
                                             <?= $i++ . "."; ?>
                                         </td>
                                         <td class="text-center aksi-col-<?= $row['id_ujian_detail'] ?>" style="width: 13%">
-                                            <button class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit ujian"
-                                                onclick="update_ujian('<?= $row['id_ujian_detail'] ?>','<?= $row['id_ujian'] ?>')">
-                                                <i class="fas fa-pen"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-danger" data-toggle="tooltip" title="Hapus ujian"
-                                                onclick="hapus('<?= $row['id_ujian_detail'] ?>')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                            <?php if ($row['status'] == "dikerjakan"): ?>
+                                                <span class="badge badge-info">Tidak bisa diubah</span>
+                                            <?php else: ?>
+                                                <button class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit ujian"
+                                                    onclick="update_ujian('<?= $row['id_ujian_detail'] ?>','<?= $row['id_ujian'] ?>')">
+                                                    <i class="fas fa-pen"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-danger" data-toggle="tooltip" title="Hapus ujian"
+                                                    onclick="hapus('<?= $row['id_ujian_detail'] ?>')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            <?php endif; ?>
                                         </td>
                                         <td>
                                             <div class="row">

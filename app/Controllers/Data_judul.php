@@ -2,15 +2,15 @@
 
 namespace App\Controllers;
 use App\Models\M_judul;
-use App\Models\M_ujian;
+use App\Models\M_soal;
 
 class Data_judul extends BaseController
 {
-    protected $judul, $ujian;
+    protected $judul, $soal;
     public function __construct()
     {
         $this->judul = new M_judul();
-        $this->ujian = new M_ujian();
+        $this->soal = new M_soal();
     }
 
     public function index()
@@ -67,9 +67,9 @@ class Data_judul extends BaseController
     public function ac_delete()
     {
         $id = $this->request->getVar('id');
-        $cek = $this->ujian->where('id_judul', $id)->first();
+        $cek = $this->soal->where('id_judul', $id)->first();
         if ($cek):
-            session()->setFlashdata('error', ' Record digunakan oleh Data Ujian!');
+            session()->setFlashdata('error', ' Record digunakan oleh Data Soal!');
         else:
             $send = $this->judul->where('id_judul', $id)->delete();
             if ($send):

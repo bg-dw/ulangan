@@ -12,7 +12,8 @@ class M_hasil extends Model
     protected $allowedFields = [
         'id_hasil',
         'id_siswa',
-        'id_ujain_detail',
+        'id_ujian_detail',
+        'id_soal',
         'jawaban',
         'status',
         'created_at',

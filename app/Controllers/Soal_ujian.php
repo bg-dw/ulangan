@@ -28,11 +28,14 @@ class Soal_ujian extends BaseController
     public function ac_add()
     {
         $id_ujian = $this->request->getVar('id-ujian');
+        $where = [
+            'id_ujian' => $id_ujian
+        ];
         $data = [
             'id_ujian' => $id_ujian,
             'status' => "final"
         ];
-        $cek = $this->detail->where($data)->first();
+        $cek = $this->detail->where($where)->first();
         if (!$cek):
             if ($id_ujian):
                 $send = $this->detail->save($data);

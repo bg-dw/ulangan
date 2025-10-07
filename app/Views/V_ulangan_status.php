@@ -46,15 +46,16 @@
                                         <td class="text-center">
                                             <span class="badge badge-primary"><?= strtoupper($row['status']) ?></span>
                                         </td>
-                                        <td class="text-center aksi-col-<?= $row['id_ujian'] ?>" style="width: 13%">
+                                        <td class="text-center aksi-col-<?= $row['id_ujian_detail'] ?>" style="width: 13%">
                                             <?php if ($row['status'] == "dikerjakan"): ?>
-                                                <button class="btn btn-info btn-rilis-token" data-id="<?= $row['id_ujian'] ?>">
+                                                <button class="btn btn-info btn-rilis-token"
+                                                    data-id="<?= $row['id_ujian_detail'] ?>">
                                                     Rilis Token
                                                 </button>
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <div class="token-display-<?= $row['id_ujian'] ?> text-center">
+                                            <div class="token-display-<?= $row['id_ujian_detail'] ?> text-center">
                                                 <?php if (!empty($row['token']) && !empty($row['expired_at'])): ?>
                                                     <h4><?= $row['token'] ?></h4>
                                                     <small class="text-muted d-block countdown"
