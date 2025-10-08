@@ -6,22 +6,48 @@ use App\Controllers\BaseController;
 use App\Models\M_ujian;
 use App\Models\M_siswa;
 use App\Models\M_ujian_detail;
+use App\Models\M_hasil;
 
 class Auth_siswa extends BaseController
 {
-    protected $ujian, $siswa, $detail;
+    protected $ujian, $siswa, $detail, $hasil;
     public function __construct()
     {
         $this->ujian = new M_ujian();
         $this->siswa = new M_siswa();
         $this->detail = new M_ujian_detail();
+        $this->hasil = new M_hasil();
+        if (session()->get('logged_in')) {
+            redirect()->to('/' . bin2hex('ujian-token') . '/' . bin2hex(session()->get('id_ujian')) . '/' . bin2hex(session()->get('id_siswa')));
+        }
     }
 
     public function index()
     {
-        $data['siswa'] = $this->siswa->where('status_login', "enable")->findAll();
         $where = "tbl_ujian_detail.status='final' OR tbl_ujian_detail.status='dikerjakan'";
         $data['ujian'] = $this->ujian->get_list_where($where);
+        return view('ujian/V_pilih_ujian', $data);
+    }
+    public function pilih_siswa()
+    {
+        $id_ujian = $this->request->getVar('id-ujian');
+        $id_detail = $this->request->getVar('id-ujian-detail');
+        $siswa = $this->siswa->get_siswa_enable();
+        $mengerjakan = $this->hasil->get_mengerjakan($id_ujian);
+
+        // Ambil semua id_siswa yang ingin dihapus
+        $ids_to_remove = array_column($mengerjakan, 'id_siswa');
+
+        // Filter array pertama, sisakan yang id_siswa-nya **tidak** ada di array kedua
+        $siswa_filtered = array_filter($siswa, function ($s) use ($ids_to_remove) {
+            return !in_array($s['id_siswa'], $ids_to_remove);
+        });
+
+        // Reset index array agar rapi
+        $siswa_filtered = array_values($siswa_filtered);
+        $data['siswa'] = $siswa_filtered;
+        $data['id_ujian'] = $id_ujian;
+        $data['id_detail'] = $id_detail;
         return view('ujian/V_auth_siswa', $data);
     }
 
@@ -30,6 +56,7 @@ class Auth_siswa extends BaseController
         if ($this->request->isAJAX()) {
             $idSiswa = $this->request->getPost('id_siswa');
             $idUjian = $this->request->getPost('id_ujian');
+            $idDetail = $this->request->getPost('id_detail');
 
             if (!$idSiswa || !$idUjian) {
                 return $this->response->setJSON([
@@ -49,17 +76,21 @@ class Auth_siswa extends BaseController
                 ]);
             }
 
+            $get = $this->ujian->where('id_ujian', $idUjian)->first();
             // set session
             session()->set([
                 'id_siswa' => $idSiswa,
+                'id_soal' => $get['id_soal'],
                 'id_ujian' => $idUjian,
+                'id_detail' => $idDetail,
+                'nama' => $siswa['nama_siswa'],
                 'logged_in' => true,
             ]);
 
             return $this->response->setJSON([
                 'success' => true,
                 'message' => 'Semoga Berhasil!',
-                'redirect_url' => base_url('/' . bin2hex('ujian-token') . '/' . bin2hex($idUjian) . '/' . bin2hex($idSiswa))
+                'redirect_url' => base_url('/' . bin2hex('ujian-token'))
             ]);
         }
 
@@ -67,19 +98,14 @@ class Auth_siswa extends BaseController
         return redirect()->to('/ulangan');
     }
 
-    function token($id_ujian, $id_siswa)
+    function token()
     {
-        $data = [
-            'id_ujian' => $id_ujian,
-            'id_siswa' => $id_siswa
-        ];
-        // dd($data);
-        return view('ujian/V_token', $data);
+        return view('ujian/V_token');
     }
 
-    public function getToken($id)
+    public function getToken()
     {
-        $id_ujian = hex2bin($id);
+        $id_ujian = hex2bin(session()->get('id_ujian'));
         $ujian = $this->detail->select('token, expired_at')
             ->where('id_ujian', $id_ujian)
             ->get()
@@ -96,13 +122,19 @@ class Auth_siswa extends BaseController
         // cek expired
         if (!empty($ujian['expired_at']) && $ujian['expired_at'] < time()) {
             // hapus otomatis
-            $this->detail->where('id_ujian', $id_ujian)
+            $sql = $this->detail->where('id_ujian', $id_ujian)
                 ->update(['token' => null, 'expired_at' => null]);
-
+            if ($sql) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'token' => null,
+                    'id' => $id_ujian
+                ]);
+            }
             return $this->response->setJSON([
                 'success' => false,
                 'token' => null,
-                'id' => $id_ujian
+                'id' => null
             ]);
         }
 
@@ -117,10 +149,10 @@ class Auth_siswa extends BaseController
 
     public function cekToken()
     {
-        $id = hex2bin($this->request->getPost('id-ujian'));
-        $id_siswa = hex2bin($this->request->getPost('id-siswa'));
+        $id = session()->get('id_ujian');
+        $id_detail = session()->get('id_detail');
+        $id_siswa = session()->get('id_siswa');
         $tokenInput = trim($this->request->getPost('token'));
-
         $ujian = $this->detail->where('id_ujian', $id)
             ->get()
             ->getRowArray();
@@ -155,6 +187,22 @@ class Auth_siswa extends BaseController
                 'message' => 'Token sudah kadaluarsa'
             ]);
         }
+        $get = $this->ujian->where('id_ujian', $id)->first();//unutk mengambil id_soal
+        $cek = $this->hasil->where(['id_ujian_detail' => $id, 'id_siswa' => $id_siswa, 'id_soal' => $get['id_soal']])->first();
+        if (!$cek):
+            $mulai = $this->hasil->save([
+                'id_siswa' => $id_siswa,
+                'id_ujian_detail' => $id_detail,
+                'id_soal' => $get['id_soal'],
+                'status' => "dikerjakan"
+            ]);
+            if (!$mulai) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Gagal Masuk Ujian!'
+                ]);
+            }
+        endif;
 
         // ✅ Token valid
         return $this->response->setJSON([
@@ -162,6 +210,4 @@ class Auth_siswa extends BaseController
             'message' => 'Token valid'
         ]);
     }
-
-
 }

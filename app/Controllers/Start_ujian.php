@@ -15,12 +15,15 @@ class Start_ujian extends BaseController
         $this->ujian = new M_ujian();
         $this->soal = new M_soal();
         $this->hasil = new M_hasil();
+        if (!session()->get('logged_in')) {
+            redirect()->to(base_url());
+        }
     }
 
-    public function start($idUjian, $idSiswa)
+    public function start()
     {
-        $id_ujian = hex2bin($idUjian);
-        $id_siswa = hex2bin($idSiswa);
+        $id_ujian = session()->get('id_ujian');
+        $id_siswa = session()->get('id_siswa');
 
         // Ambil soal berdasarkan id ujian
         $soalData = $this->soal->soal_dikerjakan($id_ujian);
@@ -110,7 +113,6 @@ class Start_ujian extends BaseController
         return view('ujian/V_halaman_ujian', $data);
     }
 
-
     //simpan jawaban
     public function simpan_jawaban()
     {
@@ -179,6 +181,8 @@ class Start_ujian extends BaseController
             'progress' => $progress,
         ]);
     }
-
+    function selesai()
+    {
+    }
 
 }

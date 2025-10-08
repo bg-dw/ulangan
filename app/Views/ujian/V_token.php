@@ -25,14 +25,13 @@
                     <div class="col-md-12 col-xl-6 offset-xl-3">
                         <div class="text-center mb-4 text-white">
                             <h1>Ujian Online</h1>
-                            <h6>Selamat Mengerjakan</h6>
+                            <h6>Selamat Mengerjakan</h6><br>
+                            <h5><?= session()->get('nama') ?></h5>
                         </div>
                         <div class="card card-primary">
                             <form id="formToken">
                                 <div class="col-md-12">
                                     <div class="card-body">
-                                        <input type="hidden" name="id-ujian" value="<?= $id_ujian ?>">
-                                        <input type="hidden" name="id-siswa" value="<?= $id_siswa ?>">
                                         <div class="form-group">
                                             <label>Masukkan Token Ujian</label>
                                             <input type="text" name="token" class="form-control" required>
@@ -95,7 +94,7 @@
 
         function loadToken() {
             $.ajax({
-                url: "<?= base_url('/' . bin2hex('ujian-get-token') . "/" . $id_ujian . "/" . $id_siswa) ?>",
+                url: "<?= base_url('/' . bin2hex('ujian-get-token')) ?>",
                 type: "GET",
                 dataType: "json",
                 success: function (res) {
@@ -163,7 +162,7 @@
 
                         setTimeout(() => {
                             // redirect ke halaman ujian
-                            window.location.href = "<?= base_url('/' . bin2hex('ujian-start') . "/" . $id_ujian . "/" . $id_siswa) ?>";
+                            window.location.href = "<?= base_url('/' . bin2hex('ujian-start')) ?>";
                         }, 1500);
 
                     } else {

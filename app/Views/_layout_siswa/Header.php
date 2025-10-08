@@ -9,4 +9,7 @@
     <link rel="stylesheet" href="<?= base_url() ?>/public/assets/css/shadow__btn.css">
     <link rel="shortcut icon" type="image/x-icon" href="<?= base_url() ?>/public/assets/img/favicon.ico">
     <link rel="stylesheet" href="<?= base_url() ?>/public/assets/bundles/izitoast/css/iziToast.min.css">
+    <!-- General JS Scripts -->
+    <script src="<?= base_url() ?>/public/assets/js/jquery-3.7.0.js"></script>
+    <script src="<?= base_url() ?>/public/assets/bundles/sweetalert/sweetalert.min.js"></script>
 </head>

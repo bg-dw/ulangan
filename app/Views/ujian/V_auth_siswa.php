@@ -29,28 +29,19 @@
                             <div class="card-body">
                                 <form method="POST" action="<?= base_url('/' . bin2hex('auth')) ?>"
                                     class="needs-validation" novalidate=""><?= csrf_field(); ?>
-                                    <div class="form-group" id="form-ujian">
-                                        <label for="user">Daftar Ujian</label>
-                                        <select class="form-control" name="id-ujian" id="pilih-ujian" required>
-                                            <option value="">== Pilih Ujian ==</option>
-                                            <?php foreach ($ujian as $row): ?>
-                                                <option value="<?= $row['id_ujian'] ?>"><?= $row['judul'] ?> -
-                                                    <?= $row['mapel'] ?>
-                                                    [<?= date("d F Y", strtotime($row['tgl'])) ?>]
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group d-none" id="list-siswa-wrapper">
+                                    <input type="hidden" value="<?= $id_ujian ?>" name="id-ujian" id="inp-id" required>
+                                    <input type="hidden" value="<?= $id_detail ?>" name="id-detail" id="inp-id-detail"
+                                        required>
+                                    <div class="form-group" id="list-siswa-wrapper">
                                         <label>Daftar Siswa</label>
                                         <div id="list-siswa" class="d-flex flex-wrap">
-                                            <?php foreach ($siswa as $row): ?>
-                                                <button type="button" class="btn btn-outline-primary m-1 btn-siswa"
-                                                    data-siswa="<?= $row['id_siswa'] ?>">
-                                                    <?= $row['nama_siswa'] ?>
-                                                </button>
-                                            <?php endforeach; ?>
+                                            <select class="form-control" name="id-siswa" id="sel-siswa" required>
+                                                <option value="">==Pilih Siswa==</option>
+                                                <?php foreach ($siswa as $row): ?>
+                                                    <option value="<?= $row['id_siswa'] ?>"><?= $row['nama_siswa'] ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
                                         </div>
                                     </div>
                                 </form>
@@ -75,30 +66,17 @@
 
 
     <script>
-        $("#pilih-ujian").on("change", function () {
-            let idUjian = $(this).val();
-
-            if (!idUjian) return;
-
-            // simpan ujian terpilih di atribut global
-            $("#list-siswa").data("ujian", idUjian);
-
-            // sembunyikan dropdown
-            $("#form-ujian").addClass("d-none");
-
-            // tampilkan daftar siswa
-            $("#list-siswa-wrapper").removeClass("d-none");
-        });
-
-        $(document).on("click", ".btn-siswa", function () {
-            let idSiswa = $(this).data("siswa");
-            let idUjian = $("#list-siswa").data("ujian"); // ambil dari data ujian yg dipilih
+        $("#sel-siswa").on("change", function () {
+            let idSiswa = $(this).val();
+            let idUjian = $("#inp-id").val();
+            let idDetail = $("#inp-id-detail").val();
             $.ajax({
                 url: "<?= base_url('/' . bin2hex('ujian-cek')) ?>",
                 method: "POST",
                 data: {
                     id_siswa: idSiswa,
                     id_ujian: idUjian,
+                    id_detail: idDetail,
                     "<?= csrf_token() ?>": "<?= csrf_hash() ?>"
                 },
                 dataType: "json",

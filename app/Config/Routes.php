@@ -39,14 +39,17 @@ $routes->get('/' . bin2hex('logout'), 'Login::logout');
 
 //UJIAN siswa
 $routes->get('/', 'Auth_siswa::index');
+$routes->post('/' . bin2hex('pilih-siswa'), 'Auth_siswa::pilih_siswa');
 $routes->post('/' . bin2hex('ujian-cek'), 'Auth_siswa::cek');
-$routes->get('/' . bin2hex('ujian-token') . "/(:any)/(:any)", 'Auth_siswa::token/$1/$2');
-$routes->get('/' . bin2hex('ujian-get-token') . "/(:any)/(:any)", 'Auth_siswa::getToken/$1/$2');
+$routes->get('/' . bin2hex('ujian-token'), 'Auth_siswa::token');
+$routes->get('/' . bin2hex('ujian-get-token'), 'Auth_siswa::getToken');
 $routes->post('/' . bin2hex('ujian-cek-token'), 'Auth_siswa::cekToken');
+$routes->get('/cek', 'Auth_siswa::cekToken');
 
 //START UJIAN
-$routes->get('/' . bin2hex('ujian-start') . "/(:any)/(:any)", 'Start_ujian::start/$1/$2');
+$routes->get('/' . bin2hex('ujian-start'), 'Start_ujian::start');
 $routes->post('/' . bin2hex('ujian-simpan-jawaban'), 'Start_ujian::simpan_jawaban');
+$routes->post('/' . bin2hex('ujian-selsai'), 'Start_ujian::selesai');
 
 $routes->group('', ['filter' => 'auth'], function ($routes) {
 

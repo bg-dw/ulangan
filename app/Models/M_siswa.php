@@ -15,4 +15,12 @@ class M_siswa extends Model
         'jk',
         'status_login'
     ];
+
+    function get_siswa_enable()
+    {
+        $this->select('tbl_siswa.id_siswa,tbl_siswa.nama_siswa');
+        $this->where('tbl_siswa.status_login', "enable");
+        $this->orderBy('tbl_siswa.nama_siswa');
+        return $this->findAll();
+    }
 }
