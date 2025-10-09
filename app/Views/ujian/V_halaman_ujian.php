@@ -1,6 +1,6 @@
 <?= $this->extend('Main_siswa') ?>
 <?= $this->section('content') ?>
-<!-- <link rel="stylesheet" href="<?= base_url() ?>/assets/css/nav-ujian.css"> -->
+<link rel="stylesheet" href="<?= base_url() ?>/assets/css/nav-ujian.css">
 <!-- Toast -->
 <div id="toastContainer" class="position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 1080;">
     <div id="toastJawaban" class="toast bg-info text-white" role="alert" aria-live="assertive" aria-atomic="true">
@@ -11,13 +11,12 @@
 </div>
 <div class="container my-3">
     <?php
-    // dd(json_encode($jawaban_siswa));
+    // dd(json_encode($soal));
     if (isset($soal)): ?>
         <div class="row">
-
             <!-- Kolom Navigasi -->
             <div class="col-12 col-md-4">
-                <div class="card shadow-sm mb-3">
+                <div class="card shadow-sm card-primary">
                     <div class="card-body">
                         <center>
                             <h6 class="fw-bold"><?= session()->get('nama') ?></h6>
@@ -25,29 +24,19 @@
                         <div class="progress my-2" style="height:22px;">
                             <div class="progress-bar bg-success" id="progressBar" style="width:0%">0%</div>
                         </div>
-                        <p class="small text-center mb-3">
+                        <p class="small text-center">
                             <span id="progressCount">0 / <?= count($soal) ?> Soal</span>
                         </p>
-                        <div id="soalNavContainer" class="d-flex flex-wrap justify-content-start">
-                            <?php foreach ($soal as $i => $s): ?>
-                                <?php
-                                $status = $statusSoal[$s['id_soal']] ?? 'none';
-                                $warna = $status === 'jawab' ? 'btn-success' :
-                                    ($status === 'ragu' ? 'btn-warning' : 'btn-outline-secondary');
-                                ?>
-                                <button class="btn <?= $warna ?> m-1 soal-nav px-3" id="nav-<?= $i ?>" data-target="<?= $i ?>"
-                                    data-idsoal="<?= $s['id_soal'] ?>">
-                                    <?= $i + 1 ?>
-                                </button>
-                            <?php endforeach; ?>
-                        </div>
                     </div>
                 </div>
             </div>
+
             <!-- Kolom Soal -->
             <div class="col-12 col-md-8 mb-3">
-                <div class="card shadow-sm">
+                <div class="card shadow-sm  card-primary">
                     <div class="card-body">
+                        <input type="hidden" value="<?= $id_detail ?>" name="id-detail" id="inp-id-detail">
+                        <input type="hidden" value="<?= $id_siswa ?>" name="id-siswa" id="inp-id-siswa">
                         <?php if (empty($soal)): ?>
                             <div class="text-center text-muted py-4">
                                 <i class="fas fa-info-circle"></i> Soal tidak ditemukan atau belum tersedia.
@@ -73,7 +62,26 @@
         <h3 class="form-control">Data Kosong</h3>
     <?php endif; ?>
 </div>
+<!-- Floating Button -->
+<button id="btnToggleSoal" class="btn btn-primary floating-btn"
+    style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+               width:60px; height:60px; border-radius:50%; z-index:2000; font-size:24px; display:flex; justify-content:center; align-items:center;">
+    ☰
+</button>
 
+<!-- Panel Nomor Soal -->
+<div id="panelSoal">
+    <div id="soalNavContainer" class="panel">
+        <?php foreach ($soal as $i => $s):
+            $status = $statusSoal[$s['id_soal']] ?? 'none';
+            $warna = $status === 'jawab' ? 'btn-success' : ($status === 'ragu' ? 'btn-warning' : 'btn-outline-secondary');
+            ?>
+            <button class="btn <?= $warna ?> soal-nav px-3" data-target="<?= $i ?>" data-idsoal="<?= $s['id_soal'] ?>">
+                <?= $i + 1 ?>
+            </button>
+        <?php endforeach; ?>
+    </div>
+</div>
 <?php
 if (isset($soal)): ?>
     <!-- Variabel JS -->
@@ -83,11 +91,40 @@ if (isset($soal)): ?>
         const idSiswa = "<?= esc($id_siswa) ?>";
         const idDetail = "<?= esc($id_detail) ?>";
         const baseUrl = "<?= base_url('/' . bin2hex('ujian-simpan-jawaban')) ?>";
-        const finishUrl = "<?= base_url('ulangan/selesai') ?>";
-
-
+        const finishUrl = "<?= base_url('/' . bin2hex('ujian-selesai')) ?>";
+        const logoutUrl = "<?= base_url('/') ?>";
     </script>
 <?php endif; ?>
+<!-- JS Floating Button & Panel -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnToggle = document.getElementById('btnToggleSoal');
+        const panel = document.getElementById('panelSoal');
+
+        // Toggle panel
+        btnToggle.addEventListener('click', () => {
+            panel.classList.toggle('show');
+
+            // Ganti icon
+            if (panel.classList.contains('show')) {
+                btnToggle.innerHTML = '&times;'; // x
+            } else {
+                btnToggle.innerHTML = '&#9776;'; // hamburger
+            }
+        });
+
+        // Klik tombol nomor soal
+        document.querySelectorAll('#soalNavContainer .soal-nav').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetIndex = +btn.dataset.target;
+                if (typeof showSoal === "function") showSoal(targetIndex);
+                panel.classList.remove('show');
+                btnToggle.innerHTML = '&#9776;'; // kembalikan hamburger
+            });
+        });
+    });
+
+</script>
 <script>
     window.jawabanSiswa = <?= json_encode($jawaban_siswa) ?>;
 </script>

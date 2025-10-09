@@ -175,11 +175,45 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================
     prevBtn.onclick = () => currentIndex > 0 && showSoal(currentIndex - 1);
     nextBtn.onclick = () => currentIndex < total - 1 && showSoal(currentIndex + 1);
+    var idDetail = $("#inp-id-detail").val();
+    var idSiswa = $("#inp-id-siswa").val();
     btnSelesai.onclick = () => {
-        if (confirm('Apakah Anda yakin ingin mengakhiri ujian ini?')) {
-            window.location.href = finishUrl;
-        }
+        swal({
+            title: "Konfirmasi",
+            text: "Apakah Anda yakin ingin menyimpan data ini?",
+            icon: "warning",
+            buttons: {
+                cancel: "Batal",
+                confirm: "Simpan"
+            },
+            dangerMode: true,
+        })
+        .then((willSave) => {
+            if (willSave) {
+                // Contoh proses simpan data dengan Ajax
+                $.ajax({
+                    url: finishUrl, // ganti dengan endpoint Anda
+                    method: 'POST',
+                    data: { id_detail:idDetail,id_siswa:idSiswa },
+                    success: function(response) {
+                        swal({
+                            title: "Berhasil",
+                            text: "Data berhasil disimpan!",
+                            icon: "success",
+                        }).then(() => {
+                            window.location.href = logoutUrl; // Beranda ujian
+                        });
+                    },
+                    error: function() {
+                        swal("Gagal", "Data gagal disimpan!", "error");
+                    }
+                });
+            } else {
+                swal("Dibatalkan", "Data tidak disimpan", "info");
+            }
+        });
     };
+
 
     // ============================
     // Klik tombol nomor soal

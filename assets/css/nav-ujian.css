@@ -1,29 +1,66 @@
-.soal-nav-wrapper {
-    display: none;
-    position: absolute;
-    bottom: 60px;
-    right: 0;
+/* Tombol floating */
+.floating-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 60px;
+    background: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    z-index: 2000;
+    font-size: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+#panelSoal {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(120%);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
     background: white;
-    padding: 10px;
     border-radius: 8px;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-    max-height: 300px;
+    padding: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    width: 80%;
+    max-width: 400px;
+    max-height: 200px;
     overflow-y: auto;
-
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 tombol per baris */
-    gap: 5px;
-    width: 180px; /* sesuaikan */
+    z-index: 1999;
+    display: flex;
+    flex-wrap: wrap;        /* aktifkan baris baru */
+    justify-content: center;
+    gap: 5px;               /* jarak antar tombol */
+}
+#soalNavContainer {
+    display: flex;
+    flex-wrap: wrap;       /* biar otomatis baris baru */
+    justify-content: center;
+    gap: 5px;              /* jarak antar tombol */
 }
 
-.soal-nav-wrapper.show {
-    display: grid;
-}
-
-.soal-nav {
-    width: 100%;  /* penuh di dalam 1 kolom grid */
-    height: 40px;
-    text-align: center;
+#soalNavContainer .soal-nav {
+    width: 40px;       /* Lebar */
+    height: 40px;  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    border-radius: 4px;
+    box-sizing: border-box;
     padding: 0;
-    font-size: 14px;
+}
+
+
+
+#panelSoal.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
 }

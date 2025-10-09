@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="<?= base_url() ?>/public/assets/css/shadow__btn.css">
     <link rel="shortcut icon" type="image/x-icon" href="<?= base_url() ?>/public/assets/img/favicon.ico">
     <link rel="stylesheet" href="<?= base_url() ?>/public/assets/bundles/izitoast/css/iziToast.min.css">
+    <link rel="stylesheet" href="<?= base_url() ?>/public/assets/bundles/select2/dist/css/select2.min.css">
 </head>
 
 <body class="bg-info">
@@ -35,7 +36,8 @@
                                     <div class="form-group" id="list-siswa-wrapper">
                                         <label>Daftar Siswa</label>
                                         <div id="list-siswa" class="d-flex flex-wrap">
-                                            <select class="form-control" name="id-siswa" id="sel-siswa" required>
+                                            <select class="form-control select2" name="id-siswa" id="sel-siswa"
+                                                required>
                                                 <option value="">==Pilih Siswa==</option>
                                                 <?php foreach ($siswa as $row): ?>
                                                     <option value="<?= $row['id_siswa'] ?>"><?= $row['nama_siswa'] ?>
@@ -58,6 +60,7 @@
     <script src="<?= base_url() ?>/public/assets/js/app.min.js"></script>
     <!-- Page Specific JS File -->
     <script src="<?= base_url() ?>/public/assets/bundles/izitoast/js/iziToast.min.js"></script>
+    <script src="<?= base_url() ?>/public/assets/bundles/select2/dist/js/select2.full.min.js"></script>
     <!-- tamplate JS File -->
     <script src="<?= base_url() ?>/public/assets/js/scripts.js"></script>
     <!-- Custom JS File -->

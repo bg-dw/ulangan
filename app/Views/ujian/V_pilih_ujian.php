@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="<?= base_url() ?>/public/assets/css/shadow__btn.css">
     <link rel="shortcut icon" type="image/x-icon" href="<?= base_url() ?>/public/assets/img/favicon.ico">
     <link rel="stylesheet" href="<?= base_url() ?>/public/assets/bundles/izitoast/css/iziToast.min.css">
+    <link rel="stylesheet" href="<?= base_url() ?>/public/assets/bundles/select2/dist/css/select2.min.css">
 </head>
 
 <body class="bg-info">
@@ -32,7 +33,8 @@
                                     <input type="hidden" name="id-ujian" value="<?= $ujian[0]['id_ujian'] ?>">
                                     <div class="form-group">
                                         <label for="user">Daftar Ujian</label>
-                                        <select class="form-control" name="id-ujian-detail" id="pilih-ujian" required>
+                                        <select class="form-control select2" name="id-ujian-detail" id="pilih-ujian"
+                                            required>
                                             <option value="">== Pilih Ujian ==</option>
                                             <?php foreach ($ujian as $row): ?>
                                                 <option value="<?= $row['id_ujian_detail'] ?>"><?= $row['judul'] ?> -
@@ -56,6 +58,7 @@
     <script src="<?= base_url() ?>/public/assets/js/app.min.js"></script>
     <!-- Page Specific JS File -->
     <script src="<?= base_url() ?>/public/assets/bundles/izitoast/js/iziToast.min.js"></script>
+    <script src="<?= base_url() ?>/public/assets/bundles/select2/dist/js/select2.full.min.js"></script>
     <!-- tamplate JS File -->
     <script src="<?= base_url() ?>/public/assets/js/scripts.js"></script>
     <!-- Custom JS File -->

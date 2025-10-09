@@ -49,7 +49,7 @@ $routes->get('/cek', 'Auth_siswa::cekToken');
 //START UJIAN
 $routes->get('/' . bin2hex('ujian-start'), 'Start_ujian::start');
 $routes->post('/' . bin2hex('ujian-simpan-jawaban'), 'Start_ujian::simpan_jawaban');
-$routes->post('/' . bin2hex('ujian-selsai'), 'Start_ujian::selesai');
+$routes->post('/' . bin2hex('ujian-selesai'), 'Start_ujian::selesai');
 
 $routes->group('', ['filter' => 'auth'], function ($routes) {
 

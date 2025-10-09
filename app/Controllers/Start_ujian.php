@@ -181,8 +181,24 @@ class Start_ujian extends BaseController
             'progress' => $progress,
         ]);
     }
+
     function selesai()
     {
+        $id_siswa = $this->request->getPost('id_siswa');
+        $id_detail = $this->request->getPost('id_detail');
+        // Ambil data jawaban existing
+        $existing = $this->hasil
+            ->where('id_siswa', $id_siswa)
+            ->where('id_ujian_detail', $id_detail)
+            ->first();
+
+        $data = [
+            'status' => "selesai",
+            'log' => ""
+        ];
+        $this->hasil->update($existing['id_hasil'], $data);
+        session()->destroy();
+        return redirect()->to(base_url('/'));
     }
 
 }
