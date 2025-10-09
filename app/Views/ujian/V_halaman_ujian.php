@@ -64,8 +64,7 @@
 </div>
 <!-- Floating Button -->
 <button id="btnToggleSoal" class="btn btn-primary floating-btn"
-    style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
-               width:60px; height:60px; border-radius:50%; z-index:2000; font-size:24px; display:flex; justify-content:center; align-items:center;">
+    style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%);width:60px; height:60px; border-radius:50%; z-index:2000; font-size:24px; display:flex; justify-content:center; align-items:center;">
     ☰
 </button>
 
@@ -90,8 +89,9 @@ if (isset($soal)): ?>
         // Konversi jawaban siswa ke format JS
         const idSiswa = "<?= esc($id_siswa) ?>";
         const idDetail = "<?= esc($id_detail) ?>";
-        const baseUrl = "<?= base_url('/' . bin2hex('ujian-simpan-jawaban')) ?>";
+        const simpanUrl = "<?= base_url('/' . bin2hex('ujian-simpan-jawaban')) ?>";
         const finishUrl = "<?= base_url('/' . bin2hex('ujian-selesai')) ?>";
+        const statusUrl = "<?= base_url('/' . bin2hex('ujian-inactive')) ?>";
         const logoutUrl = "<?= base_url('/') ?>";
     </script>
 <?php endif; ?>

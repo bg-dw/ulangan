@@ -58,6 +58,30 @@ function rewrite_jawaban() {
     }
 }
 
+// Data yang ingin dikirim ke server
+function kirimStatus() {
+    const data = {
+        id_detail: idDetail,
+        id_siswa: idSiswa,
+        timestamp: Date.now()
+    };
+
+    // ubah data menjadi Blob
+    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+
+    // sendBeacon mengirim data tanpa menunggu response
+    navigator.sendBeacon(statusUrl, blob);
+    window.location.href = logoutUrl;//langsung arahkan menuju halaman awal
+}
+
+// Deteksi halaman menjadi tidak aktif
+document.addEventListener("visibilitychange", function() {
+    if (document.hidden) {
+        console.log("Halaman tidak aktif, mengirim data...");
+        kirimStatus();
+    }
+});
+
 // ============================
 // Update progress bar
 // ============================
@@ -130,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
             form.append('jenis_soal', jenis);
             form.append('ragu', ragu);
 
-            const res = await fetch(baseUrl, { method: 'POST', body: form });
+            const res = await fetch(simpanUrl, { method: 'POST', body: form });
             const data = await res.json();
 
             if (data.success) {

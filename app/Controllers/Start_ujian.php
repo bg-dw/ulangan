@@ -153,7 +153,7 @@ class Start_ujian extends BaseController
         $data = [
             'id_siswa' => $id_siswa,
             'id_ujian_detail' => $id_detail,
-            'jawaban' => json_encode($allJawaban)
+            'jawaban' => json_encode($allJawaban ?: [])
         ];
         if ($existing) {
             $this->hasil->update($existing['id_hasil'], $data);
@@ -170,7 +170,7 @@ class Start_ujian extends BaseController
         $totalJawaban = $this->hasil
             ->where('id_ujian_detail', $id_detail)
             ->where('id_siswa', $id_siswa)
-            ->where("JSON_LENGTH(jawaban) > 0")
+            ->where("jawaban IS NOT NULL AND JSON_LENGTH(jawaban) > 0")
             ->countAllResults(false);
 
         $progress = $totalSoal > 0 ? round(($totalJawaban / $totalSoal) * 100) : 0;
@@ -199,6 +199,28 @@ class Start_ujian extends BaseController
         $this->hasil->update($existing['id_hasil'], $data);
         session()->destroy();
         return redirect()->to(base_url('/'));
+    }
+
+    function inactive()
+    {
+        // Ambil body mentah JSON
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+        $id_siswa = $data['id_siswa'];
+        $id_detail = $data['id_detail'];
+        $ts = $data['timestamp'];
+        // Ambil data jawaban existing
+        $existing = $this->hasil
+            ->where('id_siswa', $id_siswa)
+            ->where('id_ujian_detail', $id_detail)
+            ->first();
+
+        $data = [
+            'status' => "inactive",
+            'log' => $ts
+        ];
+        $this->hasil->update($existing['id_hasil'], $data);
+        session()->destroy();
     }
 
 }

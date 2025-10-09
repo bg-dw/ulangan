@@ -1,118 +1,173 @@
 <?= $this->extend('Main') ?>
 <?= $this->section('content') ?>
+<?php
+// dd($ujian);
+?>
+<style>
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+        /* Aktifkan scroll horizontal */
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    .table-container table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 800px;
+        /* Supaya tetap bisa di-scroll kalau kolom banyak */
+    }
+
+    .table-container th,
+    .table-container td {
+        white-space: nowrap;
+        /* Supaya teks tidak turun ke baris baru */
+        padding: 8px 12px;
+    }
+
+    .table-container th {
+        background-color: #f4f4f4;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    .table-container tr:nth-child(even) {
+        background-color: #fafafa;
+    }
+
+    .table-container tr:hover {
+        background-color: #f1f1f1;
+    }
+</style>
 <div class="row">
     <div class="col-12">
         <div class="card card-primary">
             <div class="card-header">
-                <h4>Daftar Login</h4>
+                <h4>Detail Ujian</h4>
             </div>
-            <div class="card-body" id="tbl-data">
-                <div class="table-responsive">
-                    <table class="table table-striped" id="table-siswa">
-                        <thead>
-                            <tr>
-                                <th class="text-center">
-                                    No.
-                                </th>
-                                <th class="text-center">Aksi</th>
-                                <th class="text-center">Nama</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php $i = 1;
-                            if (isset($siswa) && count($siswa) > 0) {
-                                foreach ($siswa as $row) {
-                                    ?>
-                                    <tr>
-                                        <td class="text-center" style="width: 7%">
-                                            <?= $i++ . "."; ?>
-                                        </td>
-                                        <td class="text-center" style="width: 13%">
-                                            <button class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit Siswa"
-                                                onclick="update_siswa('<?= $row['id_siswa'] ?>','<?= $row['nama_siswa'] ?>','<?= $row['jk'] ?>')">
-                                                <i class="fas fa-pen"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-danger" data-toggle="tooltip" title="Hapus Siswa"
-                                                onclick="hapus('<?= $row['id_siswa'] ?>','<?= $row['nama_siswa'] ?>')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                        <td>
-                                            <?= $row['nama_siswa'] ?>
-                                        </td>
-                                    </tr>
-                                    <?php
-                                }
-                            } ?>
-                        </tbody>
-                    </table>
+            <?php if (isset($ujian[0])): ?>
+                <div class="card-body">
+                    <center>
+                        <h6><?= $ujian[0]['judul'] . " - " . $ujian[0]['mapel'] . " [ " . date('l, j F Y', strtotime($ujian[0]['tgl'])) . " ]" ?>
+                        </h6>
+                    </center>
+                    <div class="table-container">
+                        <table id="tabelHasil" border="1" width="100%" cellspacing="0" cellpadding="4">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" class="text-center">No.</th>
+                                    <th rowspan="2" class="text-center">Nama</th>
+                                    <th rowspan="2" class="text-center">Status</th>
+                                    <th rowspan="2" class="text-center">Log</th>
+                                    <th id="judulSoal" colspan="0" class="text-center">Nomor Soal</th>
+                                </tr>
+                                <tr id="headerSoal"></tr>
+                            </thead>
+                            <tbody id="bodyHasil"></tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-            <div class="card-body" id="f-update" style="display:none;">
-                <form action="<?= base_url('/' . bin2hex('siswa') . '/' . bin2hex('update')) ?>" method="post"
-                    onsubmit="return confirm('Simpan Data?')">
-                    <div class="form-row">
-                        <input type="hidden" name="id" id="u-inp-id" required>
-                        <div class="form-group col-md-6">
-                            <label for="u-inp-nama">Nama Siswa</label>
-                            <input type="text" name="nama" class="form-control" id="u-inp-nama" placeholder="Midas"
-                                required>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label>Jenis Kelamin</label><br>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" name="jk" type="radio" id="u-jk-l" value="L">
-                                <label class="form-check-label" for="u-jk-l">Laki - Laki</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" name="jk" type="radio" id="u-jk-p" value="P">
-                                <label class="form-check-label" for="u-jk-p">Perempuan</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <button class="btn btn-primary" type="submit">Simpan</button>
-                        <button class="btn btn-secondary" type="button" onclick="cancel()">Batal</button>
-                    </div>
-                </form>
-            </div>
+            <?php else: ?>
+                <center>
+                    <h3>Data Tidak Ditemukan.</h3>
+                </center>
+            <?php endif ?>
         </div>
     </div>
 </div>
 <script>
-    $(document).ready(function () {
-        $('#table-siswa').DataTable({
-            paging: true,
-            searching: true,
-            ordering: true,
-            language: {
-                emptyTable: "Tidak ada data tersedia"
+    const idDetail = <?= $ujian[0]['id_ujian_detail'] ?>;
+    function get_data() {
+        $.ajax({
+            url: "<?= base_url('/' . bin2hex('get-ujian')) ?>",
+            method: 'POST',
+            data: { id_detail: idDetail },
+            success: function (data) {
+                renderTable(data);
+            },
+            error: function (xhr, status, error) {
+                console.error('Gagal mengambil data:', error);
             }
         });
-    });
-    $('#btn-cancel').click(function () {
-        $('#f-add').hide('slow');
-        $('#group-btn').show('slow');
-        $('#tbl-data').show('slow');
-    });
-
-    function update_siswa(id, nama, jk) {
-        $('#tbl-data').hide('slow');
-        $('#group-btn').hide('slow');
-        $('#f-update').show('slow');
-        $('#u-inp-id').val(id);
-        $('#u-inp-nama').val(nama);
-        if (jk == 'L') {
-            $('#u-jk-l').prop('checked', true);
-        } else {
-            $('#u-jk-p').prop('checked', true);
-        }
     }
 
-    function cancel() {
-        $('#f-update').hide('slow');
-        $('#group-btn').show('slow');
-        $('#tbl-data').show('slow');
+    let last_update = 0;
+
+    function update_log() {
+        $.ajax({
+            url: "<?= base_url('/' . bin2hex('cek-last-update')) ?>",
+            method: 'GET',
+            success: function (res) {
+                let obj = JSON.parse(res);
+                if (last_update != obj.updated_at) {
+                    get_data();
+                    console.log("mengambil data");
+                    last_update = obj.updated_at;
+                    console.log(last_update);
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr);
+            }
+        });
+    }
+    document.addEventListener("DOMContentLoaded", function () {
+        setInterval(update_log, 5000);
+    });
+
+    function renderTable(data) {
+        if (!data || data.length === 0) return;
+
+        // Ambil jawaban pertama untuk hitung total soal
+        const firstJawaban = JSON.parse(data[0].jawaban);
+        const totalSoal = Object.keys(firstJawaban).length;
+
+        // Buat header nomor soal
+        let headerSoal = '';
+        for (let i = 1; i <= totalSoal; i++) {
+            headerSoal += `<th class="text-center">${i}</th>`;
+        }
+        $('#headerSoal').html(headerSoal);
+        $('#judulSoal').attr('colspan', totalSoal);
+
+        // Isi body tabel
+        let rows = '';
+        data.forEach((siswa, index) => {
+            const jawaban = JSON.parse(siswa.jawaban);
+            let row = `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${siswa.nama_siswa}</td>
+                    <td>${siswa.status}</td>
+                    <td>${formatUnixTime(siswa.log)}</td>
+            `;
+
+            for (let i = 1; i <= totalSoal; i++) {
+                const isi = jawaban[i]?.isi ?? '-';
+                const ragu = jawaban[i]?.ragu == 1;
+                const bg = ragu ? ' style="background-color:yellow"' : '';
+                row += `<td${bg}>${isi}</td>`;
+            }
+
+            row += '</tr>';
+            rows += row;
+        });
+
+        $('#bodyHasil').html(rows);
+    }
+
+    function formatUnixTime(unix) {
+        const date = new Date(parseInt(unix) * 1000);
+        return date.toLocaleString('id-ID', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
     }
 </script>
 <?= $this->endSection() ?>

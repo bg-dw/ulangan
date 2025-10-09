@@ -17,9 +17,6 @@ class Auth_siswa extends BaseController
         $this->siswa = new M_siswa();
         $this->detail = new M_ujian_detail();
         $this->hasil = new M_hasil();
-        if (session()->get('logged_in')) {
-            redirect()->to('/' . bin2hex('ujian-token') . '/' . bin2hex(session()->get('id_ujian')) . '/' . bin2hex(session()->get('id_siswa')));
-        }
     }
 
     public function index()
@@ -188,20 +185,27 @@ class Auth_siswa extends BaseController
             ]);
         }
         $get = $this->ujian->where('id_ujian', $id)->first();//unutk mengambil id_soal
-        $cek = $this->hasil->where(['id_ujian_detail' => $id, 'id_siswa' => $id_siswa, 'id_soal' => $get['id_soal']])->first();
+        $cek = $this->hasil->where(['id_ujian_detail' => $id_detail, 'id_siswa' => $id_siswa, 'id_soal' => $get['id_soal']])->first();
         if (!$cek):
             $mulai = $this->hasil->save([
                 'id_siswa' => $id_siswa,
                 'id_ujian_detail' => $id_detail,
                 'id_soal' => $get['id_soal'],
-                'status' => "dikerjakan"
+                'status' => "dikerjakan",
+                'log' => "",
             ]);
-            if (!$mulai) {
+            if (!$mulai):
                 return $this->response->setJSON([
                     'success' => false,
                     'message' => 'Gagal Masuk Ujian!'
                 ]);
-            }
+            endif;
+        else:
+            $this->hasil->save([
+                'id_hasil' => $cek['id_hasil'],
+                'status' => "dikerjakan",
+                'log' => "",
+            ]);
         endif;
 
         // ✅ Token valid

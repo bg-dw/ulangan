@@ -50,6 +50,7 @@ $routes->get('/cek', 'Auth_siswa::cekToken');
 $routes->get('/' . bin2hex('ujian-start'), 'Start_ujian::start');
 $routes->post('/' . bin2hex('ujian-simpan-jawaban'), 'Start_ujian::simpan_jawaban');
 $routes->post('/' . bin2hex('ujian-selesai'), 'Start_ujian::selesai');
+$routes->post('/' . bin2hex('ujian-inactive'), 'Start_ujian::inactive');
 
 $routes->group('', ['filter' => 'auth'], function ($routes) {
 
@@ -101,6 +102,10 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
 	//UJIAN
 	$routes->get('/' . bin2hex('daftar-login'), 'Ulangan::index');
+	$routes->post('/' . bin2hex('get-ujian'), 'Ulangan::get_ujian');
+	$routes->get('/' . bin2hex('cek-last-update'), 'Ulangan::get_last_update');
+
+
 	$routes->get('/' . bin2hex('reset-login'), 'Ulangan::reset');
 	$routes->get('/' . bin2hex('status-tes'), 'Ulangan::status');
 	$routes->post('/' . bin2hex('data-ulangan') . '/' . bin2hex('rilis-token'), 'Ulangan::rilisToken');
