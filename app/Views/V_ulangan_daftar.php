@@ -103,9 +103,7 @@
                 let obj = JSON.parse(res);
                 if (last_update != obj.updated_at) {
                     get_data();
-                    console.log("mengambil data");
                     last_update = obj.updated_at;
-                    console.log(last_update);
                 }
             },
             error: function (xhr) {
@@ -159,7 +157,12 @@
     }
 
     function formatUnixTime(unix) {
+        // Cek dulu apakah ada nilai dan bisa diubah jadi angka
+        if (!unix || isNaN(unix)) return "";
+
         const date = new Date(parseInt(unix) * 1000);
+        if (isNaN(date.getTime())) return "";
+
         return date.toLocaleString('id-ID', {
             day: '2-digit',
             month: 'short',

@@ -1,6 +1,8 @@
 // ============================
 // Global functions
 // ============================
+
+let ujianSelesai = false;
 function updateWarnaNomor(idSoal, status) {
     const btn = document.querySelector(`.soal-nav[data-idsoal="${idSoal}"]`);
     if (!btn) return;
@@ -76,7 +78,7 @@ function kirimStatus() {
 
 // Deteksi halaman menjadi tidak aktif
 document.addEventListener("visibilitychange", function() {
-    if (document.hidden) {
+    if (document.hidden && !ujianSelesai) {
         console.log("Halaman tidak aktif, mengirim data...");
         kirimStatus();
     }
@@ -220,6 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     method: 'POST',
                     data: { id_detail:idDetail,id_siswa:idSiswa },
                     success: function(response) {
+                        ujianSelesai = true;
                         swal({
                             title: "Berhasil",
                             text: "Data berhasil disimpan!",
