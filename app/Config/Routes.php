@@ -111,7 +111,10 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 	$routes->post('/' . bin2hex('data-ulangan') . '/' . bin2hex('rilis-token'), 'Ulangan::rilisToken');
 	$routes->post('/' . bin2hex('data-ulangan') . '/' . bin2hex('hapus-token'), 'Ulangan::hapusToken');
 
+	//REKAP
 	$routes->get('/' . bin2hex('rekap'), 'Rekap::index');
+	$routes->post('/' . bin2hex('rekap-init'), 'Rekap::init_nilai');
+	$routes->post('/' . bin2hex('rekap-update-nilai'), 'Rekap::update_nilai');
 });
 
 

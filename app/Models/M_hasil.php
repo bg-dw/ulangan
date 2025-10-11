@@ -46,7 +46,7 @@ class M_hasil extends Model
     }
     function get_hasil_all_siswa_by($id_detail)
     {
-        $this->select('tbl_siswa.nama_siswa,tbl_hasil.jawaban,tbl_hasil.status,tbl_hasil.log');
+        $this->select('tbl_siswa.nama_siswa,tbl_hasil.id_hasil,tbl_hasil.jawaban,tbl_hasil.status,tbl_hasil.log');
         $this->join('tbl_siswa', 'tbl_hasil.id_siswa = tbl_siswa.id_siswa');
         $this->join('tbl_ujian_detail', 'tbl_hasil.id_ujian_detail = tbl_ujian_detail.id_ujian_detail');
         $this->join('tbl_soal', 'tbl_hasil.id_soal = tbl_soal.id_soal');
