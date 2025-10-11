@@ -46,4 +46,11 @@ class M_ujian extends Model
         $this->where('tbl_ujian.id_ujian', $id_ujian);
         return $this->first();
     }
+    function get_data_jawaban_by($id_ujian)
+    {
+        $this->select('tbl_soal.data');
+        $this->join('tbl_soal', 'tbl_ujian.id_soal = tbl_soal.id_soal');
+        $this->where('tbl_ujian.id_ujian', $id_ujian);
+        return $this->first();
+    }
 }

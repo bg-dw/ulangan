@@ -62,19 +62,20 @@ class Ulangan extends BaseController
         $data['title'] = 'Status Ujian';
         $where = "tbl_ujian_detail.status='final' OR tbl_ujian_detail.status='dikerjakan'";
         $data['ujian'] = $this->ujian->get_list_where($where);
+        if ($data['ujian']):
+            $id = $data['ujian'][0]['id_ujian_detail']; // timestamp unix dari database
+            $timestampLama = $data['ujian'][0]['expired_at']; // timestamp unix dari database
 
-        $id = $data['ujian'][0]['id_ujian_detail']; // timestamp unix dari database
-        $timestampLama = $data['ujian'][0]['expired_at']; // timestamp unix dari database
+            // Timestamp sekarang
+            $timestampSekarang = time(); // time() mengembalikan Unix timestamp saat ini
 
-        // Timestamp sekarang
-        $timestampSekarang = time(); // time() mengembalikan Unix timestamp saat ini
-
-        // Hitung selisih dalam detik
-        $selisihDetik = $timestampSekarang - $timestampLama;
-        // 5 menit = 5 * 60 detik
-        if ($selisihDetik > 5 * 60) {
-            $this->detail->update($id, ['token' => null, 'expired_at' => null]);
-        }
+            // Hitung selisih dalam detik
+            $selisihDetik = $timestampSekarang - $timestampLama;
+            // 5 menit = 5 * 60 detik
+            if ($selisihDetik > 5 * 60) {
+                $this->detail->update($id, ['token' => null, 'expired_at' => null]);
+            }
+        endif;
         return view('V_ulangan_status', $data);
     }
 
