@@ -122,18 +122,24 @@ if (isset($soal)): ?>
                 btnToggle.innerHTML = '&#9776;'; // kembalikan hamburger
             });
         });
-
-        // =====================
-        // 1️⃣  Mencegah tombol "Back"
-        // =====================
-        window.history.pushState(null, "", window.location.href);
-        window.onpopstate = function () {
-            // Dorong lagi ke halaman saat ini
-            window.history.pushState(null, "", window.location.href);
-            alert("Tombol kembali dinonaktifkan selama ujian berlangsung!");
-        };
     });
+    (function () {
+        // Tambahkan history baru setiap kali halaman dimuat
+        history.pushState(null, "", location.href);
 
+        window.addEventListener('popstate', function (event) {
+            history.pushState(null, "", location.href); // dorong kembali state
+            alert("Anda tidak dapat kembali selama ujian berlangsung!");
+        });
+
+        // Optional: cegah Alt+← dan Backspace
+        document.addEventListener('keydown', function (e) {
+            if ((e.key === 'Backspace' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) ||
+                (e.altKey && e.key === 'ArrowLeft')) {
+                e.preventDefault();
+            }
+        });
+    })();
 </script>
 <script>
     window.jawabanSiswa = <?= json_encode($jawaban_siswa) ?>;
