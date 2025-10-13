@@ -20,9 +20,10 @@ class Ulangan extends BaseController
     public function index()
     {
         $data['title'] = 'Daftar Login';
-        $where = "tbl_ujian_detail.status='final' OR tbl_ujian_detail.status='dikerjakan'";
+        $where = "tbl_ujian_detail.status='dikerjakan'";
         $data['ujian'] = $this->ujian->get_list_where($where);//mendapatkan data ujian
         $data['total_soal'] = null;
+
         if ($data['ujian']):
             $soal = $this->ujian->get_data_soal_by($data['ujian'][0]['id_ujian']);
             $json = $soal['data'];
@@ -54,8 +55,24 @@ class Ulangan extends BaseController
     public function reset()
     {
         $data['title'] = 'Reset Login';
-        $data['ujian'] = $this->ujian->findAll();
+        $data['siswa'] = $this->hasil->get_ready_reset();
         return view('V_ulangan_reset', $data);
+    }
+    //update mapel
+    public function ac_reset()
+    {
+        $data = [
+            'id_hasil' => $this->request->getVar('id'),
+            'status' => "inactive"
+        ];
+
+        $send = $this->hasil->save($data);
+        if ($send) {
+            session()->setFlashdata('success', ' Data berhasil direset.');
+        } else {
+            session()->setFlashdata('warning', ' Reset Data gagal!');
+        }
+        return redirect()->route(bin2hex('reset-login'));
     }
     public function status()
     {

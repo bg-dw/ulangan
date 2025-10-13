@@ -44,7 +44,7 @@ $routes->post('/' . bin2hex('ujian-cek'), 'Auth_siswa::cek');
 $routes->get('/' . bin2hex('ujian-token'), 'Auth_siswa::token');
 $routes->get('/' . bin2hex('ujian-get-token'), 'Auth_siswa::getToken');
 $routes->post('/' . bin2hex('ujian-cek-token'), 'Auth_siswa::cekToken');
-$routes->get('/cek', 'Auth_siswa::cekToken');
+// $routes->get('/cek', 'Auth_siswa::cekToken');
 
 //START UJIAN
 $routes->get('/' . bin2hex('ujian-start'), 'Start_ujian::start');
@@ -77,6 +77,8 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 	//SOAL
 	$routes->get('/' . bin2hex('data-soal'), 'Data_soal::index');
 	$routes->get('/' . bin2hex('data-soal') . '/' . bin2hex('add'), 'Data_soal::add_soal');
+	$routes->post('/' . bin2hex('data-soal') . '/' . bin2hex('upload'), 'Data_soal::uploadGambar');
+	$routes->post('/' . bin2hex('data-soal') . '/' . bin2hex('hapus'), 'Data_soal::hapusGambar');
 	$routes->post('/' . bin2hex('data-soal') . '/' . bin2hex('save'), 'Data_soal::saveSoal');
 	$routes->post('/' . bin2hex('data-soal') . '/' . bin2hex('delete'), 'Data_soal::ac_delete');
 
@@ -87,7 +89,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 	$routes->post('/' . bin2hex('data-draft') . '/' . bin2hex('final'), 'Data_soal::finalDraft');
 	$routes->post('/' . bin2hex('data-draft') . '/' . bin2hex('delete'), 'Data_soal::ac_delete');
 
-	//UJIAN
+	//DATA UJIAN
 	$routes->get('/' . bin2hex('data-ujian'), 'Data_ujian::index');
 	$routes->post('/' . bin2hex('data-ujian') . '/' . bin2hex('add'), 'Data_ujian::ac_add');
 	$routes->post('/' . bin2hex('data-ujian') . '/' . bin2hex('update'), 'Data_ujian::ac_update');
@@ -107,6 +109,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
 
 	$routes->get('/' . bin2hex('reset-login'), 'Ulangan::reset');
+	$routes->post('/' . bin2hex('reset-act'), 'Ulangan::ac_reset');
 	$routes->get('/' . bin2hex('status-tes'), 'Ulangan::status');
 	$routes->post('/' . bin2hex('data-ulangan') . '/' . bin2hex('rilis-token'), 'Ulangan::rilisToken');
 	$routes->post('/' . bin2hex('data-ulangan') . '/' . bin2hex('hapus-token'), 'Ulangan::hapusToken');

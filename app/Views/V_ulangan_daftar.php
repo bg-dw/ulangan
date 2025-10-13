@@ -80,8 +80,9 @@
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            setInterval(update_log);//saat pertama kali halaman dibuka
+            update_log();//saat pertama kali halaman dibuka
         });
+
         const idDetail = <?= $ujian[0]['id_ujian_detail'] ?>;
         function get_data() {
             $.ajax({
@@ -105,9 +106,11 @@
                 method: 'GET',
                 success: function (res) {
                     let obj = JSON.parse(res);
-                    if (last_update != obj.updated_at) {
-                        get_data();
-                        last_update = obj.updated_at;
+                    if (obj) {
+                        if (last_update != obj.updated_at) {
+                            get_data();
+                            last_update = obj.updated_at;
+                        }
                     }
                 },
                 error: function (xhr) {

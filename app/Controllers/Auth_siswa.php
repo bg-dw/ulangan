@@ -21,7 +21,8 @@ class Auth_siswa extends BaseController
 
     public function index()
     {
-        $where = "tbl_ujian_detail.status='final' OR tbl_ujian_detail.status='dikerjakan'";
+        session()->destroy();
+        $where = "tbl_ujian_detail.status='dikerjakan'";
         $data['ujian'] = $this->ujian->get_list_where($where);
         return view('ujian/V_pilih_ujian', $data);
     }
@@ -102,7 +103,7 @@ class Auth_siswa extends BaseController
 
     public function getToken()
     {
-        $id_ujian = hex2bin(session()->get('id_ujian'));
+        $id_ujian = session()->get('id_ujian');
         $ujian = $this->detail->select('token, expired_at')
             ->where('id_ujian', $id_ujian)
             ->get()
@@ -147,6 +148,7 @@ class Auth_siswa extends BaseController
     public function cekToken()
     {
         $id = session()->get('id_ujian');
+        $id_soal = session()->get('id_soal');
         $id_detail = session()->get('id_detail');
         $id_siswa = session()->get('id_siswa');
         $tokenInput = trim($this->request->getPost('token'));
@@ -184,34 +186,48 @@ class Auth_siswa extends BaseController
                 'message' => 'Token sudah kadaluarsa'
             ]);
         }
-        $get = $this->ujian->where('id_ujian', $id)->first();//unutk mengambil id_soal
-        $cek = $this->hasil->where(['id_ujian_detail' => $id_detail, 'id_siswa' => $id_siswa, 'id_soal' => $get['id_soal']])->first();
-        if (!$cek):
-            $mulai = $this->hasil->save([
-                'id_siswa' => $id_siswa,
-                'id_ujian_detail' => $id_detail,
-                'id_soal' => $get['id_soal'],
-                'status' => "dikerjakan",
-                'log' => "",
-            ]);
-            if (!$mulai):
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Gagal Masuk Ujian!'
-                ]);
-            endif;
-        else:
-            $this->hasil->save([
-                'id_hasil' => $cek['id_hasil'],
-                'status' => "dikerjakan",
-                'log' => "",
-            ]);
-        endif;
+        try {
+            // Cek apakah data hasil untuk siswa & soal ini sudah ada
+            $cek = $this->hasil
+                ->where([
+                    'id_ujian_detail' => $id_detail,
+                    'id_siswa' => $id_siswa,
+                    'id_soal' => $id_soal
+                ])->first();
 
-        // ✅ Token valid
-        return $this->response->setJSON([
-            'success' => true,
-            'message' => 'Token valid'
-        ]);
+            if ($cek) {
+                // --- Jika data sudah ada
+                $this->hasil->save([
+                    'id_hasil' => $cek['id_hasil'],
+                    'status' => 'dikerjakan',
+                    'log' => "",
+                ]);
+
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Lanjut Mengerjakan!',
+                ]);
+            } else {
+                // --- Jika data belum ada, buat baru ---
+                $this->hasil->save([
+                    'id_siswa' => $id_siswa,
+                    'id_ujian_detail' => $id_detail,
+                    'id_soal' => $id_soal,
+                    'status' => 'dikerjakan',
+                ]);
+
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Token valid!',
+                ]);
+            }
+        } catch (\Exception $e) {
+            // Tangani error DB
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Gagal menyimpan data: ' . $e->getMessage(),
+            ]);
+        }
+
     }
 }

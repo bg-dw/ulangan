@@ -64,4 +64,15 @@ class M_hasil extends Model
         $this->orderBy('tbl_hasil.updated_at', 'DESC');
         return $this->first();
     }
+
+    function get_ready_reset()
+    {
+        $this->select('tbl_hasil.id_hasil,tbl_hasil.status,tbl_siswa.nama_siswa');
+        $this->join('tbl_siswa', 'tbl_siswa.id_siswa = tbl_hasil.id_siswa');
+        $this->join('tbl_ujian_detail', 'tbl_ujian_detail.id_ujian_detail = tbl_hasil.id_ujian_detail');
+        $this->where('tbl_hasil.status', "dikerjakan");
+        $this->where('tbl_ujian_detail.status', "dikerjakan");
+        $this->orderBy('tbl_siswa.nama_siswa');
+        return $this->findAll();
+    }
 }

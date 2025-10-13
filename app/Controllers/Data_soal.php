@@ -33,6 +33,52 @@ class Data_soal extends BaseController
         $data['mapel'] = $this->mapel->findAll();
         return view('soal/V_soal_add', $data);
     }
+    public function uploadGambar()
+    {
+        $file = $this->request->getFile('upload'); // wajib 'upload' (CKFinderAdapter)
+        if (!$file->isValid()) {
+            return $this->response->setStatusCode(400)->setJSON(['error' => 'File tidak valid.']);
+        }
+
+        // Validasi ekstensi & ukuran
+        $ext = strtolower($file->getClientExtension());
+        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        if (!in_array($ext, $allowed)) {
+            return $this->response->setStatusCode(400)->setJSON(['error' => 'Tipe file tidak diizinkan.']);
+        }
+
+        if ($file->getSize() > 5 * 1024 * 1024) { // 5MB
+            return $this->response->setStatusCode(400)->setJSON(['error' => 'Ukuran file melebihi 5MB.']);
+        }
+
+        // Pastikan folder ada
+        $uploadPath = FCPATH . 'public/assets/uploads/';
+        if (!is_dir($uploadPath)) {
+            mkdir($uploadPath, 0777, true);
+        }
+
+        // Simpan file
+        $newName = $file->getRandomName();
+        $file->move($uploadPath, $newName);
+
+        $url = base_url('public/assets/uploads/' . $newName);
+
+        return $this->response->setJSON(['url' => $url]);
+    }
+    public function hapusGambar()
+    {
+        $url = $this->request->getPost('url');
+        if ($url) {
+            $path = FCPATH . str_replace(base_url(), '', $url);
+            if (is_file($path)) {
+                unlink($path);
+                return $this->response->setJSON(['success' => true]);
+            }
+        }
+        return $this->response->setJSON(['success' => false]);
+    }
+
+
 
     public function saveSoal()
     {
@@ -111,7 +157,6 @@ class Data_soal extends BaseController
             'msg' => 'Data tersimpan'
         ]);
     }
-
 
     // --- Draft Section ---
 

@@ -47,6 +47,8 @@
     <script src="<?= base_url() ?>/public/assets/bundles/izitoast/js/iziToast.min.js"></script>
     <script src="<?= base_url() ?>/public/assets/bundles/sweetalert/sweetalert.min.js"></script>
     <script src="<?= base_url() ?>/public/assets/bundles/select2/dist/js/select2.full.min.js"></script>
+
+    <script src="<?= base_url() ?>/public/assets/bundles/summernote/summernote-bs4.js"></script>
     <script src="<?= base_url() ?>/public/assets/js/scripts.js"></script>
     <!-- Custom JS File -->
     <script src="<?= base_url() ?>/public/assets/js/custom.js"></script>

@@ -20,7 +20,7 @@
                         </thead>
                         <tbody>
                             <?php $i = 1;
-                            if (isset($siswa) && count($siswa) > 0) {
+                            if (isset($siswa)) {
                                 foreach ($siswa as $row) {
                                     ?>
                                     <tr>
@@ -28,13 +28,9 @@
                                             <?= $i++ . "."; ?>
                                         </td>
                                         <td class="text-center" style="width: 13%">
-                                            <button class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit Siswa"
-                                                onclick="update_siswa('<?= $row['id_siswa'] ?>','<?= $row['nama_siswa'] ?>','<?= $row['jk'] ?>')">
-                                                <i class="fas fa-pen"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-danger" data-toggle="tooltip" title="Hapus Siswa"
-                                                onclick="hapus('<?= $row['id_siswa'] ?>','<?= $row['nama_siswa'] ?>')">
-                                                <i class="fas fa-trash"></i>
+                                            <button class="btn btn-sm btn-warning" data-toggle="tooltip" title="Reset Login"
+                                                onclick="update_siswa('<?= $row['id_hasil'] ?>','<?= $row['nama_siswa'] ?>')">
+                                                <i class="fas fa-user-times"></i>
                                             </button>
                                         </td>
                                         <td>
@@ -49,8 +45,8 @@
                 </div>
             </div>
             <div class="card-body" id="f-update" style="display:none;">
-                <form action="<?= base_url('/' . bin2hex('siswa') . '/' . bin2hex('update')) ?>" method="post"
-                    onsubmit="return confirm('Simpan Data?')">
+                <form action="<?= base_url('/' . bin2hex('reset-act')) ?>" method="post"
+                    onsubmit="return confirm('Reset Login?')">
                     <div class="form-row">
                         <input type="hidden" name="id" id="u-inp-id" required>
                         <div class="form-group col-md-6">
@@ -58,20 +54,9 @@
                             <input type="text" name="nama" class="form-control" id="u-inp-nama" placeholder="Midas"
                                 required>
                         </div>
-                        <div class="form-group col-md-6">
-                            <label>Jenis Kelamin</label><br>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" name="jk" type="radio" id="u-jk-l" value="L">
-                                <label class="form-check-label" for="u-jk-l">Laki - Laki</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" name="jk" type="radio" id="u-jk-p" value="P">
-                                <label class="form-check-label" for="u-jk-p">Perempuan</label>
-                            </div>
-                        </div>
                     </div>
                     <div class="text-right">
-                        <button class="btn btn-primary" type="submit">Simpan</button>
+                        <button class="btn btn-primary" type="submit">Reset</button>
                         <button class="btn btn-secondary" type="button" onclick="cancel()">Batal</button>
                     </div>
                 </form>
@@ -96,17 +81,12 @@
         $('#tbl-data').show('slow');
     });
 
-    function update_siswa(id, nama, jk) {
+    function update_siswa(id, nama) {
         $('#tbl-data').hide('slow');
         $('#group-btn').hide('slow');
         $('#f-update').show('slow');
         $('#u-inp-id').val(id);
         $('#u-inp-nama').val(nama);
-        if (jk == 'L') {
-            $('#u-jk-l').prop('checked', true);
-        } else {
-            $('#u-jk-p').prop('checked', true);
-        }
     }
 
     function cancel() {

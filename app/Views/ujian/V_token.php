@@ -29,8 +29,8 @@
                             <h5><?= session()->get('nama') ?></h5>
                         </div>
                         <div class="card card-primary">
-                            <form id="formToken">
-                                <div class="col-md-12">
+                            <div class="col-md-12">
+                                <form id="formToken">
                                     <div class="card-body">
                                         <div class="form-group">
                                             <label>Masukkan Token Ujian</label>
@@ -40,12 +40,12 @@
                                     <div class="card-footer text-right">
                                         <button type="submit" class="btn btn-primary">Masuk</button>
                                     </div>
-                                    <div id="tokenAlert"></div>
-                                    <div id="token-box" class="alert alert-info text-center">Menunggu token
-                                        ujian...
-                                    </div>
+                                </form>
+                                <div id="tokenAlert"></div>
+                                <div id="token-box" class="alert alert-info text-center">Menunggu token
+                                    ujian...
                                 </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -66,126 +66,110 @@
     <?= $this->include('_layout/alert') ?>
 
     <script>
-        let countdownInterval;
-        let lastExpiredAt = null;
+        $(function () {
+            let countdownInterval = null;
 
-        function startCountdown(expiredAt) {
-            // stop timer lama
-            clearInterval(countdownInterval);
+            function showWaitingToken() {
+                clearInterval(countdownInterval);
+                $("#token-box")
+                    .removeClass('alert-success alert-danger')
+                    .addClass('alert-info')
+                    .html("Menunggu token baru...");
+            }
 
-            countdownInterval = setInterval(function () {
-                let now = Date.now();
-                let distance = expiredAt.getTime() - now;
+            function startCountdown(expiredAt) {
+                clearInterval(countdownInterval); // hentikan interval lama
 
-                if (distance <= 0) {
-                    clearInterval(countdownInterval);
-                    $("#token-box")
-                        .removeClass('alert-success')
-                        .addClass('alert-info')
-                        .html("Token sudah expired. Menunggu token baru...");
-                    lastExpiredAt = null;
-                } else {
-                    let minutes = Math.floor((distance / 1000 / 60) % 60);
-                    let seconds = Math.floor((distance / 1000) % 60);
-                    $("#countdown").text("Expired dalam: " + minutes + "m " + seconds + "s");
+                // Buat span countdown hanya sekali
+                let $tokenBox = $("#token-box");
+                $tokenBox
+                    .removeClass('alert-info alert-danger')
+                    .addClass('alert-success');
+
+                if ($("#countdown").length === 0) {
+                    $tokenBox.html("<span id='countdown'></span>");
                 }
-            }, 1000);
-        }
 
-        function loadToken() {
-            $.ajax({
-                url: "<?= base_url('/' . bin2hex('ujian-get-token')) ?>",
-                type: "GET",
-                dataType: "json",
-                success: function (res) {
-                    if (res.success && res.expired_at) {
-                        let expiredAt = new Date(res.expired_at);
+                countdownInterval = setInterval(function () {
+                    let now = Date.now();
+                    let distance = expiredAt.getTime() - now;
 
-                        // kalau expired_at baru / berbeda → reset timer
-                        if (!lastExpiredAt || expiredAt.getTime() !== lastExpiredAt.getTime()) {
-                            lastExpiredAt = expiredAt;
-
-                            $("#token-box")
-                                .removeClass('alert-info alert-danger')
-                                .addClass('alert-success')
-                                .html("<span id='countdown'></span>");
-
-                            startCountdown(expiredAt);
-                        }
-
-                    } else {
-                        $("#token-box")
-                            .removeClass('alert-success')
-                            .addClass('alert-info')
-                            .html("Menunggu token ujian...");
-                        lastExpiredAt = null;
+                    if (distance <= 0) {
                         clearInterval(countdownInterval);
-                    }
-                },
-                error: function (err) {
-                    console.error("AJAX error:", err);
-                    $("#token-box")
-                        .removeClass('alert-success')
-                        .addClass('alert-danger')
-                        .html("Gagal memuat token.");
-                }
-            });
-        }
-
-        // cek otomatis tiap 5 detik
-        setInterval(loadToken, 5000);
-        loadToken();
-
-
-        $("#formToken").on("submit", function (e) {
-            e.preventDefault();
-
-            let $btn = $(this).find("button[type=submit]");
-            let oldHtml = $btn.html();
-
-            // state loading
-            $btn.prop("disabled", true).html('<i class="fas fa-spinner fa-spin"></i> Cek...');
-
-            $.ajax({
-                url: "<?= base_url('/' . bin2hex('ujian-cek-token')) ?>",
-                type: "POST",
-                data: $(this).serialize(),
-                dataType: "json",
-                success: function (res) {
-                    if (res.success) {
-                        iziToast.success({
-                            title: 'Sukses',
-                            message: res.message,
-                            position: 'topCenter',
-                            timeout: 2000
-                        });
-
-                        setTimeout(() => {
-                            // redirect ke halaman ujian
-                            window.location.href = "<?= base_url('/' . bin2hex('ujian-start')) ?>";
-                        }, 1500);
-
+                        showWaitingToken();
                     } else {
-                        iziToast.error({
-                            title: 'Token Salah',
-                            message: res.message,
-                            position: 'topCenter',
-                            timeout: 3000
-                        });
+                        let minutes = Math.floor((distance / 1000 / 60) % 60);
+                        let seconds = Math.floor((distance / 1000) % 60);
+                        $("#countdown").text("Expired dalam: " + minutes + "m " + seconds + "s");
                     }
-                },
-                error: function () {
-                    iziToast.error({
-                        title: 'Error',
-                        message: 'Terjadi kesalahan server.',
-                        position: 'topCenter',
-                        timeout: 3000
-                    });
-                },
-                complete: function () {
-                    // restore button
-                    $btn.prop("disabled", false).html(oldHtml);
-                }
+                }, 1000);
+            }
+
+
+            function loadToken() {
+                $.ajax({
+                    url: "<?= base_url('/' . bin2hex('ujian-get-token')) ?>",
+                    type: "GET",
+                    dataType: "json",
+                    success: function (res) {
+
+                        if (res.success && res.expired_at) {
+                            let expiredAt = new Date(res.expired_at); // ISO 8601 → JS Date
+
+                            if (expiredAt.getTime() > Date.now()) {
+                                startCountdown(expiredAt);
+                            } else {
+                                showWaitingToken();
+                            }
+                        } else {
+                            showWaitingToken();
+                        }
+                    },
+                    error: function () {
+                        $("#token-box")
+                            .removeClass('alert-success alert-info')
+                            .addClass('alert-danger')
+                            .html("Gagal memuat token.");
+                    }
+                });
+            }
+
+            // cek token tiap 5 detik
+            setInterval(loadToken, 5000);
+
+            // load pertama kali
+            loadToken();
+
+            // handle form submit
+            $("#formToken").on("submit", function (e) {
+                e.preventDefault();
+                let $btn = $(this).find("button[type=submit]");
+                let oldHtml = $btn.html();
+
+                $btn.prop("disabled", true).html('<i class="fas fa-spinner fa-spin"></i> Cek...');
+
+                $.ajax({
+                    url: "<?= base_url('/' . bin2hex('ujian-cek-token')) ?>",
+                    type: "POST",
+                    data: $(this).serialize(),
+                    dataType: "json",
+                    success: function (res) {
+                        if (res.success) {
+                            iziToast.success({ title: 'Sukses', message: res.message, position: 'topCenter', timeout: 2000 });
+                            setTimeout(() => {
+                                window.location.href = "<?= base_url('/' . bin2hex('ujian-start')) ?>";
+                            }, 1500);
+                        } else {
+                            iziToast.error({ title: 'Token Salah', message: res.message, position: 'topCenter', timeout: 3000 });
+                        }
+                    },
+                    error: function () {
+                        iziToast.error({ title: 'Error', message: 'Terjadi kesalahan server.', position: 'topCenter', timeout: 3000 });
+                    },
+                    complete: function () {
+                        $btn.prop("disabled", false).html(oldHtml);
+                    }
+                });
             });
         });
 

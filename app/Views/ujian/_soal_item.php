@@ -9,7 +9,7 @@ foreach ($soal as $index => $s):
             <button class="btn btn-info mb-3">
                 <span class="fw-bold" style="font-size: 24px;"><b><?= $index + 1 ?></b></span>
             </button>
-            <p class="jumbotron" style="font-size: 16px;"><?= esc($s['pertanyaan']) ?></p>
+            <div class="jumbotron"><?= $s['pertanyaan'] ?></div>
         </div>
         <?php if ($s['jenis_soal'] === 'pilihan_ganda'): ?>
             <?php

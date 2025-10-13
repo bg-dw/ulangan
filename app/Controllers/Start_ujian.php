@@ -108,7 +108,9 @@ class Start_ujian extends BaseController
                 'statusSoal' => $statusSoal,
                 'jawaban_siswa' => $jawabanSiswaDb
             ];
-
+        else:
+            session()->destroy();
+            return redirect()->to(base_url('/'));
         endif;
         return view('ujian/V_halaman_ujian', $data);
     }
@@ -203,6 +205,8 @@ class Start_ujian extends BaseController
 
     function inactive()
     {
+
+        session()->destroy();
         // Ambil body mentah JSON
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
@@ -220,7 +224,6 @@ class Start_ujian extends BaseController
             'log' => $ts
         ];
         $this->hasil->update($existing['id_hasil'], $data);
-        session()->destroy();
     }
 
 }

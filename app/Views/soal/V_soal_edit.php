@@ -3,6 +3,14 @@
 <?php
 // dd($draft['data']); 
 ?>
+<!-- Toast -->
+<div id="toastContainer" class="position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 1080;">
+    <div id="toastJawaban" class="toast bg-info text-white" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-body">
+            Gambar tersimpan!
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-12">
         <div class="card card-primary">
@@ -85,91 +93,91 @@
     </div>
 </div>
 <script>
-    /** Data draft dari server */
-    const draftData = <?= json_encode($draft['data']) ?> || null;
+    document.addEventListener('DOMContentLoaded', function () {
+        const draftData = <?= json_encode($draft['data']) ?> || null;
+        const lastImagesMap = {}; // global untuk semua editor
 
-    /** helper: pastikan nilai menjadi array */
-    function toArrayMaybe(x) {
-        if (x == null) return [];
-        if (Array.isArray(x)) return x;
-        if (typeof x === 'object') {
-            const keys = Object.keys(x);
-            const numericKeys = keys.every(k => String(Number(k)) === String(k));
-            if (numericKeys) {
-                return keys.sort((a, b) => Number(a) - Number(b)).map(k => x[k]);
+        /** helper untuk normalisasi object menjadi array */
+        function normalizeIndexedObject(obj) {
+            if (Array.isArray(obj)) return obj;
+            if (obj && typeof obj === 'object') {
+                const keys = Object.keys(obj).sort((a, b) => Number(a) - Number(b));
+                return keys.map(k => obj[k]);
             }
-            return Object.values(x);
+            return obj ? [obj] : [];
         }
-        return [x];
-    }
 
-    /** MAIN: generate fields di #generatedFields */
-    /** escape helpers */
-    function escapeHtml(s) {
-        if (s == null) return '';
-        return String(s)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;');
-    }
-    function escapeAttr(s) {
-        if (s == null) return '';
-        return String(s)
-            .replace(/&/g, '&amp;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;');
-    }
-
-    /** Normalisasi supaya object { "1":"...", "2":"..." } jadi array ["...","..."] */
-    function normalizeIndexedObject(obj) {
-        if (Array.isArray(obj)) return obj;
-        if (obj && typeof obj === 'object') {
-            const keys = Object.keys(obj).sort((a, b) => Number(a) - Number(b));
-            return keys.map(k => obj[k]);
+        /** helper: pastikan nilai menjadi array */
+        function toArrayMaybe(x) {
+            if (x == null) return [];
+            if (Array.isArray(x)) return x;
+            if (typeof x === 'object') {
+                const keys = Object.keys(x);
+                const numericKeys = keys.every(k => String(Number(k)) === String(k));
+                if (numericKeys) {
+                    return keys.sort((a, b) => Number(a) - Number(b)).map(k => x[k]);
+                }
+                return Object.values(x);
+            }
+            return [x];
         }
-        return obj ? [obj] : [];
-    }
 
+        /** MAIN: generate fields di #generatedFields */
+        /** escape helpers */
+        function escapeHtml(s) {
+            if (s == null) return '';
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+        function escapeAttr(s) {
+            if (s == null) return '';
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
 
-    /** MAIN: generate fields di #generatedFields */
-    function generateSoalFieldFromDraft(data) {
-        const container = document.getElementById('generatedFields');
-        container.innerHTML = '';
-        if (!data) return;
+        /** Generate soal dinamis */
+        function generateSoalFieldFromDraft(data) {
+            const container = document.getElementById('generatedFields');
+            container.innerHTML = '';
+            if (!data) return;
+            const jenisArr = normalizeIndexedObject(data.jenis_soal) || [];
+            const jumlahArr = normalizeIndexedObject(data.jumlah_soal) || [];
+            const pertGroups = normalizeIndexedObject(data.pertanyaan) || [];
+            const opsiGroups = normalizeIndexedObject(data.opsi) || [];
+            const kunciGroups = normalizeIndexedObject(data.kunci) || [];
 
-        const jenisArr = normalizeIndexedObject(data.jenis_soal) || [];
-        const jumlahArr = normalizeIndexedObject(data.jumlah_soal) || [];
-        const pertGroups = normalizeIndexedObject(data.pertanyaan) || [];
-        const opsiGroups = normalizeIndexedObject(data.opsi) || [];
-        const kunciGroups = normalizeIndexedObject(data.kunci) || [];
+            let soalCounter = 1;
 
-        let soalCounter = 1;
+            jenisArr.forEach((jenis, groupIndex) => {
+                const savedQuestions = normalizeIndexedObject(pertGroups[groupIndex]) || [];
+                const opsiForGroup = normalizeIndexedObject(opsiGroups[groupIndex]) || [];
+                const kForGroup = normalizeIndexedObject(kunciGroups[groupIndex]) || [];
+                let count = savedQuestions.length || parseInt(jumlahArr[groupIndex]) || 0;
+                if (count <= 0) return;
 
-        jenisArr.forEach((jenis, groupIndex) => {
-            const savedQuestions = normalizeIndexedObject(pertGroups[groupIndex]) || [];
-            const opsiForGroup = normalizeIndexedObject(opsiGroups[groupIndex]) || [];
-            const kForGroup = normalizeIndexedObject(kunciGroups[groupIndex]) || [];
+                for (let si = 0; si < count; si++) {
+                    const qText = savedQuestions[si] || '';
+                    const editorId = `${soalCounter}_${si}`;
 
-            let count = savedQuestions.length || parseInt(jumlahArr[groupIndex]) || 0;
-            if (count <= 0) return;
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'mb-3 p-3 border rounded';
 
-            for (let si = 0; si < count; si++) {
-                const qText = savedQuestions[si] || '';
-                const wrapper = document.createElement('div');
-                wrapper.className = 'mb-3 p-3 border rounded';
-
-                wrapper.innerHTML = `
-                <label class="fw-bold">Soal ${soalCounter} (${jenis.replace("_", " ")})</label>
-                <textarea class="form-control mb-2" name="pertanyaan[${groupIndex}][]">${escapeHtml(qText)}</textarea>
-            `;
-
-                if (jenis === 'pilihan_ganda') {
-                    const opsiForSoal = normalizeIndexedObject(opsiForGroup[si]) || [];
-                    ['a', 'b', 'c', 'd'].forEach(letter => {
-                        const val = opsiForSoal[letter] || opsiForSoal[letter === 'a' ? 0 : letter === 'b' ? 1 : letter === 'c' ? 2 : 3] || '';
-                        wrapper.innerHTML += `
+                    wrapper.innerHTML = `
+                    <label class="fw-bold">Soal ${soalCounter} (${jenis.replace("_", " ")})</label>
+                    <textarea class="form-control soal-editor mb-2" name="pertanyaan[${groupIndex}][]" data-id="${editorId}" placeholder="Tulis pertanyaan">${escapeHtml(qText)}</textarea>
+                    <span id="image-upload-status-${editorId}" class="upload-status badge bg-success text-white" style="display:none;"></span>
+                `;
+                    if (jenis === 'pilihan_ganda') {
+                        const opsiForSoal = normalizeIndexedObject(opsiForGroup[si]) || [];
+                        ['a', 'b', 'c', 'd'].forEach(letter => {
+                            const val = opsiForSoal[letter] || opsiForSoal[letter === 'a' ? 0 : letter === 'b' ? 1 : letter === 'c' ? 2 : 3] || '';
+                            wrapper.innerHTML += `
                         <div class="input-group mb-1">
                             <span class="input-group-text text-uppercase">${letter}.</span>
                             <input type="text" class="form-control"
@@ -178,10 +186,10 @@
                                 value="${escapeAttr(val)}">
                         </div>
                     `;
-                    });
+                        });
 
-                    const savedKunci = kForGroup[si] || '';
-                    wrapper.innerHTML += `
+                        const savedKunci = kForGroup[si] || '';
+                        wrapper.innerHTML += `
                     <label class="mt-2">Kunci Jawaban</label>
                     <select class="form-control mb-1" name="kunci[${groupIndex}][]">
                         ${['a', 'b', 'c', 'd'].map(opt => `
@@ -189,43 +197,114 @@
                         `).join('')}
                     </select>
                 `;
-                } else if (jenis === 'isian' || jenis === 'uraian') {
-                    const savedKunci = kForGroup[si] || '';
-                    if (jenis === 'uraian') {
-                        wrapper.innerHTML += `
+                    } else if (jenis === 'isian' || jenis === 'uraian') {
+                        const savedKunci = kForGroup[si] || '';
+                        if (jenis === 'uraian') {
+                            wrapper.innerHTML += `
                         <label class="mt-2">Panduan / Kunci Jawaban</label>
                         <textarea class="form-control" name="kunci[${groupIndex}][]">${escapeHtml(savedKunci)}</textarea>
                     `;
-                    } else {
-                        wrapper.innerHTML += `
+                        } else {
+                            wrapper.innerHTML += `
                         <label class="mt-2">Kunci Jawaban</label>
                         <input type="text" class="form-control" name="kunci[${groupIndex}][]" value="${escapeAttr(savedKunci)}">
                     `;
+                        }
                     }
+                    container.appendChild(wrapper);
+
+                    lastImagesMap[editorId] = [];
+                    soalCounter++;
                 }
+            });
 
-                container.appendChild(wrapper);
-                soalCounter++;
-            }
-        });
-    }
+            // Inisialisasi Summernote untuk semua textarea
+            $('.soal-editor').each(function () {
+                const editor = $(this);
+                const editorId = editor.data('id');
+                const status = $('#image-upload-status-' + editorId);
+                status.hide();
+                editor.summernote({
+                    height: 300,
+                    dialogsInBody: true,
+                    placeholder: 'Tulis soal atau teks di sini...',
+                    toolbar: [
+                        ['style', ['bold', 'italic', 'underline', 'clear']],
+                        ['insert', ['picture', 'link', 'table', 'hr']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['view', ['fullscreen', 'codeview']]
+                    ],
+                    callbacks: {
+                        onImageUpload: function (files) {
+                            const data = new FormData();
+                            data.append('upload', files[0]);
 
-    /** run on DOM ready */
-    document.addEventListener('DOMContentLoaded', function () {
-        console.log('draftData', draftData);
+                            status.text('Uploading image...').show();
+
+                            $.ajax({
+                                url: '<?= base_url('/' . bin2hex('data-soal') . '/' . bin2hex('upload')) ?>',
+                                method: 'POST',
+                                data: data,
+                                cache: false,
+                                contentType: false,
+                                processData: false,
+                                xhr: function () {
+                                    const xhr = new window.XMLHttpRequest();
+                                    xhr.upload.addEventListener("progress", function (evt) {
+                                        if (evt.lengthComputable) {
+                                            const percent = Math.round((evt.loaded / evt.total) * 100);
+                                            status.text('Uploading image... ' + percent + '%');
+                                        }
+                                    });
+                                    return xhr;
+                                },
+                                success: function (response) {
+                                    console.log(response);
+                                    editor.summernote('insertImage', response.url);
+                                    lastImagesMap[editorId].push(response.url);
+
+                                    // Show toast
+                                    if (typeof bootstrap !== 'undefined') {
+                                        const toastEl = document.getElementById('toastJawaban');
+                                        new bootstrap.Toast(toastEl, { delay: 3000 }).show();
+                                    }
+                                },
+                                error: function () {
+                                    status.text('Upload gagal!').css('color', 'red');
+                                    setTimeout(() => status.hide(), 3000);
+                                }
+                            });
+                        },
+                        onChange: function (contents) {
+                            const currentImages = [];
+                            $(contents).find('img').each(function () {
+                                currentImages.push($(this).attr('src'));
+                            });
+
+                            const deleted = lastImagesMap[editorId].filter(src => !currentImages.includes(src));
+                            deleted.forEach(src => {
+                                $.post('<?= base_url('/' . bin2hex('data-soal') . '/' . bin2hex('hapus')) ?>', { url: src });
+                            });
+
+                            lastImagesMap[editorId] = currentImages;
+                        }
+                    }
+                });
+            });
+        }
+
+        /** Jalankan generate */
         generateSoalFieldFromDraft(draftData);
 
+        /** Form control */
         const form = document.getElementById("draftForm");
         const statusInput = document.getElementById("formStatus");
 
-        // validasi semua input dan textarea
         function validateForm() {
             let isValid = true;
             const fields = form.querySelectorAll("input[name], textarea[name], select[name]");
             fields.forEach(el => {
-                // skip hidden
                 if (el.type === "hidden" || el.disabled) return;
-
                 if (!el.value.trim()) {
                     el.classList.add("is-invalid");
                     isValid = false;
@@ -236,28 +315,22 @@
             return isValid;
         }
 
-        // tombol simpan final
         const btnFinal = document.getElementById("btnFinal");
         const btnUpdate = document.getElementById("btnUpdate");
 
-        if (btnFinal) {
-            btnFinal.addEventListener("click", function () {
-                if (!validateForm()) {
-                    alert("Masih ada field yang kosong. Harap lengkapi semua isian sebelum finalisasi.");
-                    return;
-                }
-                form.action = "<?= base_url('/' . bin2hex('data-draft') . '/' . bin2hex('final')) ?>";
-                statusInput.value = "final";
-                form.submit();
-            });
-        }
+        if (btnFinal) btnFinal.addEventListener("click", function () {
+            if (!validateForm()) {
+                alert("Masih ada field kosong, lengkapi semua isian.");
+                return;
+            }
+            statusInput.value = "final";
+            form.action = "<?= base_url('/' . bin2hex('data-draft') . '/' . bin2hex('final')) ?>";
+            form.submit();
+        });
 
-        // tombol update draft → biarkan default
-        if (btnUpdate) {
-            btnUpdate.addEventListener("click", function () {
-                statusInput.value = "draft";
-            });
-        }
+        if (btnUpdate) btnUpdate.addEventListener("click", function () {
+            statusInput.value = "draft";
+        });
     });
 
 </script>

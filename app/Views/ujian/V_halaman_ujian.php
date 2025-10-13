@@ -122,6 +122,16 @@ if (isset($soal)): ?>
                 btnToggle.innerHTML = '&#9776;'; // kembalikan hamburger
             });
         });
+
+        // =====================
+        // 1️⃣  Mencegah tombol "Back"
+        // =====================
+        window.history.pushState(null, "", window.location.href);
+        window.onpopstate = function () {
+            // Dorong lagi ke halaman saat ini
+            window.history.pushState(null, "", window.location.href);
+            alert("Tombol kembali dinonaktifkan selama ujian berlangsung!");
+        };
     });
 
 </script>

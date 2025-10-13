@@ -18,7 +18,9 @@
 <link rel="stylesheet" href="<?= base_url() ?>/public/assets/bundles/bootstrap-daterangepicker/daterangepicker.css">
 <link rel="stylesheet" href="<?= base_url() ?>/public/assets/bundles/pretty-checkbox/pretty-checkbox.min.css">
 <link rel="stylesheet" href="<?= base_url() ?>/public/assets/bundles/bootstrap-daterangepicker/daterangepicker.css">
+<link rel="stylesheet" href="<?= base_url() ?>/public/assets/bundles/summernote/summernote-bs4.css">
 <script src="<?= base_url() ?>/public/assets/js/jquery-3.7.0.js"></script>
+
 <style type="text/css" media="print">
     @page {
         size: landscape;
