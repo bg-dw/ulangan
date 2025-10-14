@@ -118,6 +118,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 	$routes->get('/' . bin2hex('rekap'), 'Rekap::index');
 	$routes->post('/' . bin2hex('rekap-init'), 'Rekap::init_nilai');
 	$routes->post('/' . bin2hex('rekap-update-nilai'), 'Rekap::update_nilai');
+	$routes->get('/' . bin2hex('rekap-get-hasil') . "/(:any)", 'Rekap::get_data_by/$1');
 });
 
 

@@ -124,20 +124,13 @@ if (isset($soal)): ?>
         });
     });
     (function () {
-        // Tambahkan history baru setiap kali halaman dimuat
-        history.pushState(null, "", location.href);
+        // Buat state palsu untuk mengunci history
+        history.pushState(null, '', location.href);
 
         window.addEventListener('popstate', function (event) {
-            history.pushState(null, "", location.href); // dorong kembali state
-            alert("Anda tidak dapat kembali selama ujian berlangsung!");
-        });
-
-        // Optional: cegah Alt+← dan Backspace
-        document.addEventListener('keydown', function (e) {
-            if ((e.key === 'Backspace' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) ||
-                (e.altKey && e.key === 'ArrowLeft')) {
-                e.preventDefault();
-            }
+            // Dorong kembali ke halaman ujian
+            history.pushState(null, '', location.href);
+            alert('Anda tidak dapat kembali selama ujian berlangsung!');
         });
     })();
 </script>

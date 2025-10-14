@@ -10,6 +10,7 @@
         /* Aktifkan scroll horizontal */
         border: 1px solid #ccc;
         border-radius: 6px;
+        background: #fff;
     }
 
     .table-container table {
@@ -27,10 +28,11 @@
     }
 
     .table-container th {
-        background-color: #f4f4f4;
+        background-color: #6D94C5;
+        color: white;
         position: sticky;
         top: 0;
-        z-index: 2;
+        z-index: 1;
     }
 
     .table-container tr:nth-child(even) {
@@ -39,6 +41,10 @@
 
     .table-container tr:hover {
         background-color: #f1f1f1;
+    }
+
+    table td {
+        font-weight: bold;
     }
 </style>
 <div class="position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 1055">
@@ -49,27 +55,41 @@
         </div>
     </div>
 </div>
-<?php if (isset($ujian[0])): ?>
+<?php
+if (isset($daftar)): ?>
     <div class="row">
         <div class="col-12">
             <div class="card card-primary">
                 <div class="card-header">
                     <h4>Detail Ujian</h4>
                 </div>
-                <?php if (isset($ujian[0])): ?>
+                <?php if (isset($daftar)): ?>
                     <div class="card-body">
                         <center>
-                            <h6><?= $ujian[0]['judul'] . " - " . $ujian[0]['mapel'] . " [ " . date('l, j F Y', strtotime($ujian[0]['tgl'])) . " ]" ?>
+                            <h6><?= $judul . " - " . $mapel . " [ " . date('l, j F Y', strtotime($tgl)) . " ]" ?>
                             </h6>
                         </center>
-                        <div class="table-container">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <select id="selectUjian" class="form-control">
+                                    <?php foreach ($daftar as $u): ?>
+                                        <option value="<?= $u['id_ujian_detail'] ?>" <?= ($id_terpilih == $u['id_ujian_detail']) ? 'selected' : '' ?>>
+                                            <?= esc($u['judul']) ?> - <?= esc($u['mapel']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="table-container" class="table-scroll-wrapper"
+                            style="overflow: auto; max-height: 70vh; border: 1px solid;" id="tableContainer">
                             <table id="tabelHasil" border="1" width="100%" cellspacing="0" cellpadding="4">
                                 <thead>
                                     <tr>
-                                        <th rowspan="2" class="text-center">No.</th>
-                                        <th rowspan="2" class="text-center">Nama</th>
-                                        <th rowspan="2" class="text-center">Status</th>
-                                        <th rowspan="2" class="text-center">Log</th>
+                                        <th rowspan="2" class="text-center" style="width: 5%;">No.</th>
+                                        <th rowspan="2" class="text-center" style="width: 20%;">Nama</th>
+                                        <th rowspan="2" class="text-center" style="width: 10%;">Status</th>
+                                        <th rowspan="2" class="text-center" style="width: 10%;">Log</th>
                                         <th id="judulSoal" colspan="0" class="text-center">Nomor Soal</th>
                                     </tr>
                                     <tr id="headerSoal"></tr>
@@ -92,11 +112,24 @@
         const nilai_max = <?= json_encode($max) ?>;
         const jenis_soal = <?= json_encode($jenis) ?>;
         const nilai_tersimpan = <?= json_encode($nilai_tersimpan) ?>;
+        const idDetail = <?= $id_ujian_detail ?>;
 
-        const idDetail = <?= $ujian[0]['id_ujian_detail'] ?>;
         const dataUrl = "<?= base_url('/' . bin2hex('get-ujian')) ?>";
         const initUrl = "<?= base_url('/' . bin2hex('rekap-init')) ?>";
         const updateUrl = "<?= base_url('/' . bin2hex('rekap-update-nilai')) ?>";
+
+        let sudahInitNilai = false;
+
+        $(document).ready(function () {
+            // tampilkan default ujian saat halaman pertama kali dibuka
+            get_data($("#selectUjian").val());
+
+            // ubah ujian
+            $("#selectUjian").on("change", function () {
+                const id = $(this).val();
+                window.location.replace("<?= base_url('/' . bin2hex('rekap-get-hasil')) ?>" + "/" + id);
+            });
+        });
     </script>
     <script src="<?= base_url('assets/js/rekap.js') ?>"></script>
 <?php else: ?>

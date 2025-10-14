@@ -112,9 +112,6 @@ class Start_ujian extends BaseController
             session()->destroy();
             return redirect()->to(base_url('/'));
         endif;
-        //mencegah browser ke halaman sebelumnya (dengan cache)
-        $this->response->setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
-        $this->response->setHeader('Pragma', 'no-cache');
         return view('ujian/V_halaman_ujian', $data);
     }
 
