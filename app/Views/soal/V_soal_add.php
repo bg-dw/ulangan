@@ -167,10 +167,10 @@
 
                     if (jenis === "pilihan_ganda") {
                         field += `
-                        <div class="input-group mb-1"><span class="input-group-text text-uppercase"><strong>A.</strong></span><input type="text" class="form-control" name="jawaban[${rowIndex}][${i}][a]" placeholder="Pilihan A"></div>
-                        <div class="input-group mb-1"><span class="input-group-text text-uppercase"><strong>B.</strong></span><input type="text" class="form-control" name="jawaban[${rowIndex}][${i}][b]" placeholder="Pilihan B"></div>
-                        <div class="input-group mb-1"><span class="input-group-text text-uppercase"><strong>C.</strong></span><input type="text" class="form-control" name="jawaban[${rowIndex}][${i}][c]" placeholder="Pilihan C"></div>
-                        <div class="input-group mb-1"><span class="input-group-text text-uppercase"><strong>D.</strong></span><input type="text" class="form-control" name="jawaban[${rowIndex}][${i}][d]" placeholder="Pilihan D"></div>
+                        <div class="input-group mb-1"><span class="input-group-text text-uppercase"><strong>A.</strong></span><input type="text" class="form-control" name="opsi[${rowIndex}][${i}][]" placeholder="Pilihan A"></div>
+                        <div class="input-group mb-1"><span class="input-group-text text-uppercase"><strong>B.</strong></span><input type="text" class="form-control" name="opsi[${rowIndex}][${i}][]" placeholder="Pilihan B"></div>
+                        <div class="input-group mb-1"><span class="input-group-text text-uppercase"><strong>C.</strong></span><input type="text" class="form-control" name="opsi[${rowIndex}][${i}][]" placeholder="Pilihan C"></div>
+                        <div class="input-group mb-1"><span class="input-group-text text-uppercase"><strong>D.</strong></span><input type="text" class="form-control" name="opsi[${rowIndex}][${i}][]" placeholder="Pilihan D"></div>
                         <label class="mt-2"><strong>Kunci Jawaban</strong></label>
                         <select class="form-control col-1" name="kunci[${rowIndex}][${i}]">
                             <option value="a">A</option><option value="b">B</option><option value="c">C</option><option value="d">D</option>

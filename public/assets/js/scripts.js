@@ -512,6 +512,12 @@ $(function () {
         singleDatePicker: true
       });
     }
+    if ($(".datepicker-id").length) {
+      $(".datepicker-id").daterangepicker({
+        locale: { format: "DD/MM/YYYY" },
+        singleDatePicker: true
+      });
+    }
     if ($(".datetimepicker").length) {
       $(".datetimepicker").daterangepicker({
         locale: { format: "YYYY-MM-DD hh:mm" },

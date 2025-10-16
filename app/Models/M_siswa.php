@@ -23,4 +23,13 @@ class M_siswa extends Model
         $this->orderBy('tbl_siswa.nama_siswa');
         return $this->findAll();
     }
+
+    function get_siswa($nama, $tgl)
+    {
+        $this->select('tbl_siswa.id_siswa,tbl_siswa.nama_siswa');
+        $this->where('tbl_siswa.status_login', "enable");
+        $this->where("SUBSTRING_INDEX(nama_siswa, ' ', 1)=", $nama);
+        $this->where('tbl_siswa.tgl', $tgl);
+        return $this->first();
+    }
 }

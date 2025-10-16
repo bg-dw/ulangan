@@ -70,14 +70,21 @@ if (isset($daftar)): ?>
                             </h6>
                         </center>
                         <div class="row mb-3">
-                            <div class="col-md-6">
-                                <select id="selectUjian" class="form-control">
+                            <div class="col-md-6 position-relative">
+                                <button id="btnPilihUjian" class="btn btn-primary w-100 col-md-2">
+                                    <i class="fas fa-list"></i> Pilih Ujian
+                                </button>
+
+                                <div id="floatingSelect"
+                                    class="border rounded shadow-sm bg-white position-absolute w-100 d-none"
+                                    style="z-index: 1050; max-height: 250px; overflow-y: auto;">
                                     <?php foreach ($daftar as $u): ?>
-                                        <option value="<?= $u['id_ujian_detail'] ?>" <?= ($id_terpilih == $u['id_ujian_detail']) ? 'selected' : '' ?>>
-                                            <?= esc($u['judul']) ?> - <?= esc($u['mapel']) ?>
-                                        </option>
+                                        <div class="dropdown-item p-2 border-bottom pilih-ujian-item"
+                                            data-id="<?= $u['id_ujian_detail'] ?>" style="cursor:pointer;">
+                                            <strong><?= esc($u['judul']) ?></strong> - <?= esc($u['mapel']) ?>
+                                        </div>
                                     <?php endforeach; ?>
-                                </select>
+                                </div>
                             </div>
                         </div>
 
@@ -123,13 +130,37 @@ if (isset($daftar)): ?>
         $(document).ready(function () {
             // tampilkan default ujian saat halaman pertama kali dibuka
             get_data($("#selectUjian").val());
-
-            // ubah ujian
-            $("#selectUjian").on("change", function () {
-                const id = $(this).val();
-                window.location.replace("<?= base_url('/' . bin2hex('rekap-get-hasil')) ?>" + "/" + id);
-            });
         });
+
+        $(document).ready(function () {
+            const dropdown = $("#floatingSelect");
+
+            // Toggle tampil/sembunyi daftar ujian
+            $("#btnPilihUjian").on("click", function (e) {
+                e.stopPropagation();
+                dropdown.toggleClass("d-none");
+            });
+
+            // Klik di luar → sembunyikan dropdown
+            $(document).on("click", function () {
+                dropdown.addClass("d-none");
+            });
+
+            // Klik item ujian
+            $(".pilih-ujian-item").on("click", function (e) {
+                e.stopPropagation();
+                const id = $(this).data("id");
+                dropdown.addClass("d-none");
+
+                // Redirect ke hasil ujian yang dipilih
+                window.location.replace("<?= base_url('/' . bin2hex('rekap-get-hasil')) ?>/" + id);
+            });
+
+            // Inisialisasi default data
+            get_data(<?= $id_ujian_detail ?>);
+        });
+
+
     </script>
     <script src="<?= base_url('assets/js/rekap.js') ?>"></script>
 <?php else: ?>

@@ -52,6 +52,12 @@ $routes->post('/' . bin2hex('ujian-simpan-jawaban'), 'Start_ujian::simpan_jawaba
 $routes->post('/' . bin2hex('ujian-selesai'), 'Start_ujian::selesai');
 $routes->post('/' . bin2hex('ujian-inactive'), 'Start_ujian::inactive');
 
+//RAPOR
+$routes->get('/rapor', 'Rapor::index');
+$routes->post('/' . bin2hex('rapor-cek'), 'Rapor::auth');
+$routes->get('/' . bin2hex('rapor-tampil') . "/(:any)/(:any)", 'Rapor::tampil/$1/$2');
+$routes->get('/' . bin2hex('rapor-tampil-pilihan') . "/(:any)/(:any)/(:any)", 'Rapor::tampil_pilihan/$1/$2/$3');
+
 $routes->group('', ['filter' => 'auth'], function ($routes) {
 
 	//DATA MASTER
